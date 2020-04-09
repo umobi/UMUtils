@@ -22,6 +22,7 @@ pod 'UMUtils'
 
 ## Author
 
+Ramon Vicente, ramon@umobi.com.br
 brennobemoura, brenno@umobi.com.br
 
 ## License

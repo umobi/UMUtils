@@ -27,15 +27,16 @@ open class AlertView: UIContainer.View {
     }
     
     public func updateHeight(_ view: UIView!, height: CGFloat) {
-        if let heightConstraint = view.cbuild.height.find().first {
-            heightConstraint.constant = height
+        guard let superview = view.superview else {
             return
         }
 
-        Constraintable.activate(
+        Constraintable.update(
             view.cbuild
                 .height
-                .equalTo(height)
+                .equalTo(superview)
+                .update()
+                .constant(height)
         )
     }
     
