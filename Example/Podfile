@@ -1,0 +1,9 @@
+use_frameworks!
+target 'UMUtils_Example' do
+  pod 'UMUtils', :path => '../'
+  
+  target 'UMUtils_Tests' do
+    inherit! :search_paths
+
+  end
+end

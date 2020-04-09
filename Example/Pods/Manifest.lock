@@ -1,0 +1,16 @@
+PODS:
+  - UMUtils (0.1.0)
+
+DEPENDENCIES:
+  - UMUtils (from `../`)
+
+EXTERNAL SOURCES:
+  UMUtils:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  UMUtils: 4bc585a4c917f9df40192082f28b23819a4cd20c
+
+PODFILE CHECKSUM: 9f08154518acc3dd0d020bb561d621521e6a22a5
+
+COCOAPODS: 1.8.1
