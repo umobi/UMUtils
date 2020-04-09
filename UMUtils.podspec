@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'UMUtils'
-  s.version          = '0.4.8'
+  s.version          = '1.0.0'
   s.summary          = "Utility Class Library"
 
 # This description is used to generate tags and improve search results.
@@ -21,15 +21,15 @@ Pod::Spec.new do |s|
 TODO: Add long description of the pod here.
                        DESC
 
-  s.homepage         = 'https://github.com/ramonvic'
+  s.homepage         = 'https://github.com/umobi/UMUtils'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'Ramon Vicente' => 'ramonvicentesilva@hotmail.com' }
-  s.source           = { :git => 'https://github.com/ramonvic/umutils-swift.git', :tag => s.version.to_s }
+  s.author           = { 'Ramon Vicente' => 'ramonvicentesilva@hotmail.com', 'brennobemoura' => 'brenno@umobi.com.br' }
+  s.source           = { :git => 'https://github.com/umobi/UMUtils.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '10.0'
-  s.swift_version = "5.1"
+  
   s.source_files = 'UMUtils/Classes/**/*'
   
   # s.resource_bundles = {
