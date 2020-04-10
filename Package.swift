@@ -12,13 +12,13 @@ let package = Package(
     products: [
         // Products define the executables and libraries produced by a package, and make them visible to other packages.
         .library(name: "UMUtils", targets: ["UMUtils"]),
-        .library(name: "UMMaterial", targets: ["UMUtils"]),
-        .library(name: "UMView", targets: ["UMUtils"]),
-        .library(name: "RxUMUtils", targets: ["UMUtils"]),
-        .library(name: "RxUMAIFlatSwitch", targets: ["UMUtils"]),
-        .library(name: "RxUMActivity", targets: ["UMUtils"]),
-        .library(name: "UMViewModel", targets: ["UMUtils"]),
-        .library(name: "UMAPIModel", targets: ["UMUtils"])
+        .library(name: "UMMaterial", targets: ["UMMaterial"]),
+        .library(name: "UMView", targets: ["UMView"]),
+        .library(name: "RxUMUtils", targets: ["RxUMUtils"]),
+        .library(name: "RxUMAIFlatSwitch", targets: ["RxUMAIFlatSwitch"]),
+        .library(name: "RxUMActivity", targets: ["RxUMActivity"]),
+        .library(name: "UMViewModel", targets: ["UMViewModel"]),
+        .library(name: "UMAPIModel", targets: ["UMAPIModel"])
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
