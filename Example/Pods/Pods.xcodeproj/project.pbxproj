@@ -56,7 +56,6 @@
 		0CC7CE97234509DF00F23145 /* UIViewController+Preparation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC7CE74234509DE00F23145 /* UIViewController+Preparation.swift */; };
 		0CC7CE98234509DF00F23145 /* UIView+Corner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC7CE75234509DE00F23145 /* UIView+Corner.swift */; };
 		0CC7CE99234509DF00F23145 /* Number+Price.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC7CE76234509DE00F23145 /* Number+Price.swift */; };
-		0CC7CE9A234509DF00F23145 /* UIViewController+Notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC7CE77234509DE00F23145 /* UIViewController+Notification.swift */; };
 		0CC7CE9B234509DF00F23145 /* UIImage+Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC7CE78234509DE00F23145 /* UIImage+Color.swift */; };
 		0CC7CE9C234509DF00F23145 /* String+Validations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC7CE79234509DE00F23145 /* String+Validations.swift */; };
 		0CC7CE9D234509DF00F23145 /* UIImage+Resizing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC7CE7A234509DE00F23145 /* UIImage+Resizing.swift */; };
@@ -152,7 +151,6 @@
 		0CC7CE74234509DE00F23145 /* UIViewController+Preparation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+Preparation.swift"; sourceTree = "<group>"; };
 		0CC7CE75234509DE00F23145 /* UIView+Corner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Corner.swift"; sourceTree = "<group>"; };
 		0CC7CE76234509DE00F23145 /* Number+Price.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Number+Price.swift"; sourceTree = "<group>"; };
-		0CC7CE77234509DE00F23145 /* UIViewController+Notification.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+Notification.swift"; sourceTree = "<group>"; };
 		0CC7CE78234509DE00F23145 /* UIImage+Color.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Color.swift"; sourceTree = "<group>"; };
 		0CC7CE79234509DE00F23145 /* String+Validations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Validations.swift"; sourceTree = "<group>"; };
 		0CC7CE7A234509DE00F23145 /* UIImage+Resizing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Resizing.swift"; sourceTree = "<group>"; };
@@ -358,7 +356,6 @@
 				0CC7CE74234509DE00F23145 /* UIViewController+Preparation.swift */,
 				0CC7CE75234509DE00F23145 /* UIView+Corner.swift */,
 				0CC7CE76234509DE00F23145 /* Number+Price.swift */,
-				0CC7CE77234509DE00F23145 /* UIViewController+Notification.swift */,
 				0CC7CE78234509DE00F23145 /* UIImage+Color.swift */,
 				0CC7CE79234509DE00F23145 /* String+Validations.swift */,
 				0CC7CE7A234509DE00F23145 /* UIImage+Resizing.swift */,
@@ -630,7 +627,6 @@
 				0CC7CE94234509DE00F23145 /* UIScrollView+Scroll.swift in Sources */,
 				0CC7CEA8234509DF00F23145 /* String+Emoji.swift in Sources */,
 				0CC7CEA4234509DF00F23145 /* NSAttributedString+HTMLString.swift in Sources */,
-				0CC7CE9A234509DF00F23145 /* UIViewController+Notification.swift in Sources */,
 				0CC7CE92234509DE00F23145 /* UIViewController+Additions.swift in Sources */,
 				0C92465123770F77006DAB60 /* Error+APIError.swift in Sources */,
 				0C92464E23770F77006DAB60 /* Moya+Rx.swift in Sources */,
