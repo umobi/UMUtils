@@ -56,7 +56,7 @@ extension ObservableType {
 }
 
 extension ObservableType {
-    public func asFunction(_ disposeBag: DisposeBag) -> (@escaping (E) -> Void) -> Void  {
+    public func asFunction(_ disposeBag: DisposeBag) -> (@escaping (Element) -> Void) -> Void  {
         return { handler in
             self.subscribe(onNext: {
                 handler($0)
@@ -85,8 +85,8 @@ extension SharedSequence where SharingStrategy == DriverSharingStrategy {
 // MARK: - ignoreErrors()
 
 extension ObservableType {
-  public func ignoreErrors() -> Observable<E> {
-    return self.catchError { error -> Observable<E> in
+  public func ignoreErrors() -> Observable<Element> {
+    return self.catchError { error -> Observable<Element> in
       return .empty()
     }
   }
@@ -96,6 +96,7 @@ extension ObservableType {
 
 infix operator <->
 
+@available(*, deprecated, message: "Use BehaviorRelay instead")
 @discardableResult public func <-><T>(property: ControlProperty<T>, variable: Variable<T>) -> Disposable {
     let variableToProperty = variable.asObservable()
         .bind(to: property)

@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'UMUtils'
-  s.version          = '1.0.0'
+  s.version          = '1.1.0'
   s.summary          = "Utility Class Library"
 
 # This description is used to generate tags and improve search results.
@@ -29,64 +29,61 @@ TODO: Add long description of the pod here.
   s.ios.deployment_target = '10.0'
   s.swift_version = '5.1'
   
-  s.source_files = 'UMUtils/Classes/**/*'
+  s.source_files = 'Sources/**/*'
 
   s.subspec 'Core' do |ss|
-      ss.source_files = 'UMUtils/Classes/Core/**/*.swift'
+      ss.source_files = 'Sources/Core/**/*.swift'
   end
   
-  s.subspec 'Material' do |ss|
-      ss.source_files = 'UMUtils/Classes/Material/**/*.swift'
+  s.subspec 'MaterialUtils' do |ss|
+      ss.source_files = 'Sources/MaterialUtils/**/*.swift'
 
       ss.dependency 'UMUtils/Core'
-      ss.dependency 'Material'
-      ss.dependency 'ConstraintBuilder'
+      ss.dependency 'Material', '~> 3.1.8'
+      ss.dependency 'ConstraintBuilder', "~> 1.0.2"
   end
   
   s.subspec 'View' do |ss|
-      ss.source_files = 'UMUtils/Classes/View/**/*.swift'
+      ss.source_files = 'Sources/View/**/*.swift'
 
       ss.dependency 'UMUtils/Core'
-      ss.dependency 'ConstraintBuilder'
-      ss.dependency 'UIContainer', '~> 1.2.0-beta.6'
-      ss.platform = :ios, '10.0'
+      ss.dependency 'ConstraintBuilder', "~> 1.0.2"
+      ss.dependency 'UIContainer', '~> 1.2.0-beta.9'
   end
 
   s.subspec 'Rx' do |ss|
-      ss.source_files = 'UMUtils/Classes/Rx/*.swift'
+      ss.source_files = 'Sources/Rx/*.swift'
       
       ss.dependency 'UMUtils/Core'
-      ss.dependency 'RxSwift', '4.5'
-      ss.dependency 'RxCocoa', '4.5'
+      ss.dependency 'RxSwift', '~> 5.0.0'
+      ss.dependency 'RxCocoa', '~> 5.0.0'
   end
 
-  s.subspec 'AIFlatSwitch_Rx' do |ss|
-      ss.source_files = 'UMUtils/Classes/Rx/AIFlatSwitch/**/*.swift'
+  s.subspec 'RxAIFlatSwitch' do |ss|
+      ss.source_files = 'Sources/RxAIFlatSwitch/**/*.swift'
 
       ss.dependency 'UMUtils/Rx'
-      ss.dependency 'RxSwift', '4.5'
-      ss.dependency 'RxCocoa', '4.5'
-      ss.dependency 'AIFlatSwitch'
+      ss.dependency 'AIFlatSwitch', "~> 1.0.7"
   end
 
-  s.subspec 'Activity_Rx' do |ss|
-      ss.source_files = 'UMUtils/Classes/Rx/Activity/**/*.swift'
+  s.subspec 'RxActivity' do |ss|
+      ss.source_files = 'Sources/RxActivity/**/*.swift'
 
       ss.dependency 'UMUtils/Rx'
-      ss.dependency 'UIContainer', '~> 1.2.0-beta.6'
+      ss.dependency 'UIContainer', '~> 1.2.0-beta.9'
   end
   
   s.subspec 'ViewModel' do |s|
-      s.source_files = 'UMUtils/Classes/ViewModel/**/*.swift'
+      s.source_files = 'Sources/ViewModel/**/*.swift'
       
       s.dependency 'UMUtils/Core'
   end
 
   s.subspec 'APIModel' do |ss|
-      ss.source_files = 'UMUtils/Classes/APIModel/**/*.swift'
-      ss.dependency 'Moya'
-      ss.dependency 'RxSwift', '4.5'
-      ss.dependency 'RxCocoa', '4.5'
+      ss.source_files = 'Sources/APIModel/**/*.swift'
+      ss.dependency 'Moya', "~> 14.0.0"
+      ss.dependency 'RxSwift', '~> 5.0.0'
+      ss.dependency 'RxCocoa', '~> 5.0.0'
   end
 
 end

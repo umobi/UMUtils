@@ -27,38 +27,38 @@ public typealias ActivityIndicatorFilter = (activityIndicator: ActivityIndicator
 
 public extension ObservableConvertibleType {
 
-  /// Filters the elements of an observable sequence based on an ActivityIndicator.
-  ///
-  ///     let loading = ActivityIndicator()
-  ///     source
-  ///         .filter(!loading)
-  ///         .flatMap { ... }
-  ///         .subscribe { ... }
-  ///
-func filter(_ activityIndicator: ActivityIndicator) -> Observable<Self.E> {
-    return self.filter(activityIndicator == true)
-  }
+    /// Filters the elements of an observable sequence based on an ActivityIndicator.
+    ///
+    ///     let loading = ActivityIndicator()
+    ///     source
+    ///         .filter(!loading)
+    ///         .flatMap { ... }
+    ///         .subscribe { ... }
+    ///
+    func filter(_ activityIndicator: ActivityIndicator) -> Observable<Element> {
+        return self.filter(activityIndicator == true)
+    }
 
-func filter(_ activityIndicatorFilter: ActivityIndicatorFilter) -> Observable<Self.E> {
-    let (activityIndicator, condition) = activityIndicatorFilter
-    return self.asObservable()
-      .withLatestFrom(activityIndicator.asObservable().startWith(false)) { ($0, $1) }
-      .filter { _, isLoading in
-            isLoading == condition
+    func filter(_ activityIndicatorFilter: ActivityIndicatorFilter) -> Observable<Element> {
+        let (activityIndicator, condition) = activityIndicatorFilter
+        return self.asObservable()
+            .withLatestFrom(activityIndicator.asObservable().startWith(false)) { ($0, $1) }
+            .filter { _, isLoading in
+                isLoading == condition
         }
-      .map { element, _ in element }
-  }
+        .map { element, _ in element }
+    }
 }
 
 // MARK: filter
 extension SharedSequenceConvertibleType {
 
-    public func filter(_ activityIndicator: ActivityIndicator) -> SharedSequence<DriverSharingStrategy, E> {
+    public func filter(_ activityIndicator: ActivityIndicator) -> SharedSequence<DriverSharingStrategy, Element> {
         return self.filter(activityIndicator == true)
     }
 
-    public func filter(_ activityIndicatorFilter: ActivityIndicatorFilter) -> SharedSequence<DriverSharingStrategy, E> {
-        let observable: Observable<Self.E> = self.filter(activityIndicatorFilter)
+    public func filter(_ activityIndicatorFilter: ActivityIndicatorFilter) -> SharedSequence<DriverSharingStrategy, Element> {
+        let observable: Observable<Element> = self.filter(activityIndicatorFilter)
         return observable.asDriver(onErrorDriveWith: Driver.never())
     }
 }
@@ -66,13 +66,13 @@ extension SharedSequenceConvertibleType {
 prefix operator !
 
 public prefix func ! (activityIndicator: ActivityIndicator) -> ActivityIndicatorFilter {
-  return activityIndicator == false
+    return activityIndicator == false
 }
 
 public prefix func ! (activityIndicatorFilter: ActivityIndicatorFilter) -> ActivityIndicatorFilter {
-  return (activityIndicatorFilter.activityIndicator, !activityIndicatorFilter.condition)
+    return (activityIndicatorFilter.activityIndicator, !activityIndicatorFilter.condition)
 }
 
 func == (activityIndicator: ActivityIndicator, condition: Bool) -> ActivityIndicatorFilter {
-  return (activityIndicator, condition)
+    return (activityIndicator, condition)
 }

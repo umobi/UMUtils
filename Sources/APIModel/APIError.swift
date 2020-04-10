@@ -67,7 +67,7 @@ public struct APIError: Codable {
     }
 
     public func encode(to encoder: Encoder) {
-        let container = try encoder.container(keyedBy: EncodingKeys.self).wrapper
+        let container = encoder.container(keyedBy: EncodingKeys.self).wrapper
 
         if case .api(let error) = type {
             error >- container[.error]
@@ -158,7 +158,7 @@ extension APIError {
             switch self {
             case .api(let error):
                 return error.messages ?? []
-            case .error(let error):
+            case .error:
                 return []
             }
         }

@@ -62,7 +62,7 @@ public extension APIError {
                     return try JSONDecoder().decode(APIError.self, from: response.data)
                 }
 
-                if case .underlying((let error, _)) = moyaError {
+                if case .underlying(let error, _) = moyaError {
                     return .init(error: error)
                 }
 
