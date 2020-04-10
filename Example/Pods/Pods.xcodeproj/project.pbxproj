@@ -20,7 +20,6 @@
 		0C1F06512345016700462EF1 /* RxCLLocationManagerDelegateProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1F063F2345016700462EF1 /* RxCLLocationManagerDelegateProxy.swift */; };
 		0C1F06522345016700462EF1 /* UIControl+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1F06402345016700462EF1 /* UIControl+Rx.swift */; };
 		0C1F06532345016700462EF1 /* EmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1F06422345016700462EF1 /* EmptyView.swift */; };
-		0C1F06552345016700462EF1 /* CNPPopupTheme+Material.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1F06452345016700462EF1 /* CNPPopupTheme+Material.swift */; };
 		0C1F06572345016700462EF1 /* TransitionController+ViewControllers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1F06482345016700462EF1 /* TransitionController+ViewControllers.swift */; };
 		0C1F95FA2346AD35005E0B4C /* UIView+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1F95F92346AD35005E0B4C /* UIView+Rx.swift */; };
 		0C6CBF8E234BEA3300F49216 /* AlertButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6CBF8A234BEA3300F49216 /* AlertButton.swift */; };
@@ -117,7 +116,6 @@
 		0C1F063F2345016700462EF1 /* RxCLLocationManagerDelegateProxy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RxCLLocationManagerDelegateProxy.swift; sourceTree = "<group>"; };
 		0C1F06402345016700462EF1 /* UIControl+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIControl+Rx.swift"; sourceTree = "<group>"; };
 		0C1F06422345016700462EF1 /* EmptyView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmptyView.swift; sourceTree = "<group>"; };
-		0C1F06452345016700462EF1 /* CNPPopupTheme+Material.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CNPPopupTheme+Material.swift"; sourceTree = "<group>"; };
 		0C1F06482345016700462EF1 /* TransitionController+ViewControllers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TransitionController+ViewControllers.swift"; sourceTree = "<group>"; };
 		0C1F95F92346AD35005E0B4C /* UIView+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Rx.swift"; sourceTree = "<group>"; };
 		0C6CBF8A234BEA3300F49216 /* AlertButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertButton.swift; sourceTree = "<group>"; };
@@ -271,15 +269,6 @@
 			);
 			name = View;
 			path = UMUtils/Classes/View;
-			sourceTree = "<group>";
-		};
-		0C1F06442345016700462EF1 /* Popup */ = {
-			isa = PBXGroup;
-			children = (
-				0C1F06452345016700462EF1 /* CNPPopupTheme+Material.swift */,
-			);
-			name = Popup;
-			path = UMUtils/Classes/Popup;
 			sourceTree = "<group>";
 		};
 		0C1F06462345016700462EF1 /* Material */ = {
@@ -442,7 +431,6 @@
 				0C92464223770F77006DAB60 /* APIModel */,
 				0CC7CE64234509DE00F23145 /* Core */,
 				0C1F06462345016700462EF1 /* Material */,
-				0C1F06442345016700462EF1 /* Popup */,
 				0C1F06342345016700462EF1 /* Rx */,
 				0CC7CEAD2345207F00F23145 /* ViewModel */,
 				0C1F06412345016700462EF1 /* View */,
@@ -696,7 +684,6 @@
 				0CC7CE9E234509DF00F23145 /* UIView+Border.swift in Sources */,
 				0C1F064D2345016700462EF1 /* AIFlatSwitch+Rx.swift in Sources */,
 				0CC7CE9B234509DF00F23145 /* UIImage+Color.swift in Sources */,
-				0C1F06552345016700462EF1 /* CNPPopupTheme+Material.swift in Sources */,
 				0CC7CEAB234509DF00F23145 /* UILabel+Boldify.swift in Sources */,
 				0C1F064C2345016700462EF1 /* ActivityIndicator.swift in Sources */,
 				0C9246292377007D006DAB60 /* UIScrollView+Rx.swift in Sources */,

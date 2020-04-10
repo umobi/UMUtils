@@ -10,7 +10,7 @@ import Foundation
 
 public extension Date.Style {
 
-    public struct Time {
+    struct Time {
         public enum Granularity {
             case hour(Int)
             case minute(Int)
@@ -41,11 +41,11 @@ public extension Date.Style {
         }
     }
 
-    public var hour: Time {
+    var hour: Time {
         return .init(.hour(self.date.components.hour))
     }
 
-    public var minute: Time {
+    var minute: Time {
         return .init(.minute(self.date.components.minute))
     }
 

@@ -9,7 +9,7 @@
 import Foundation
 
 public extension Date {
-    public struct Components {
+    struct Components {
         public let date: Date
 
         fileprivate init(_ date: Date) {

@@ -9,7 +9,7 @@
 import Foundation
 
 extension Date.Style {
-    public struct WeekDay {
+    struct WeekDay {
         private let date: Date
 
         fileprivate init(_ date: Date) {
@@ -35,7 +35,7 @@ extension Date.Style {
         }
     }
 
-    public var weekday: WeekDay {
+    var weekday: WeekDay {
         return .init(self.date)
     }
 }

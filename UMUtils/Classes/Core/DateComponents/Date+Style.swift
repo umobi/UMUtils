@@ -9,7 +9,7 @@
 import Foundation
 
 public extension Date {
-    public struct Style {
+    struct Style {
         public let date: Date
 
         fileprivate init(_ date: Date) {
@@ -17,7 +17,7 @@ public extension Date {
         }
     }
 
-    public var style: Style {
+    var style: Style {
         return .init(self)
     }
 }

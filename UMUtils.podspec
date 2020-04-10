@@ -22,23 +22,14 @@ TODO: Add long description of the pod here.
                        DESC
 
   s.homepage         = 'https://github.com/umobi/UMUtils'
-  # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'Ramon Vicente' => 'ramonvicentesilva@hotmail.com', 'brennobemoura' => 'brenno@umobi.com.br' }
+  s.author           = { 'Ramon Vicente' => 'ramon@umobi.com.br', 'brennobemoura' => 'brenno@umobi.com.br' }
   s.source           = { :git => 'https://github.com/umobi/UMUtils.git', :tag => s.version.to_s }
-  # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '10.0'
+  s.swift_version = '5.1'
   
   s.source_files = 'UMUtils/Classes/**/*'
-  
-  # s.resource_bundles = {
-  #   'UMUtils' => ['UMUtils/Assets/*.png']
-  # }
-
-  # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
-  # s.dependency 'AFNetworking', '~> 2.3'
 
   s.subspec 'Core' do |ss|
       ss.source_files = 'UMUtils/Classes/Core/**/*.swift'
@@ -55,8 +46,9 @@ TODO: Add long description of the pod here.
   s.subspec 'View' do |ss|
       ss.source_files = 'UMUtils/Classes/View/**/*.swift'
 
+      ss.dependency 'UMUtils/Core'
       ss.dependency 'ConstraintBuilder'
-      ss.dependency 'UIContainer', '~> 1.2.0-beta.3'
+      ss.dependency 'UIContainer', '~> 1.2.0-beta.6'
       ss.platform = :ios, '10.0'
   end
 
@@ -80,16 +72,14 @@ TODO: Add long description of the pod here.
   s.subspec 'Activity_Rx' do |ss|
       ss.source_files = 'UMUtils/Classes/Rx/Activity/**/*.swift'
 
-      ss.dependency 'UIContainer', '~> 1.2.0-beta.3'
+      ss.dependency 'UMUtils/Rx'
+      ss.dependency 'UIContainer', '~> 1.2.0-beta.6'
   end
   
   s.subspec 'ViewModel' do |s|
       s.source_files = 'UMUtils/Classes/ViewModel/**/*.swift'
-  end
-  
-  s.subspec 'Popup' do |ss|
-      ss.source_files = 'UMUtils/Classes/Popup/**/*.swift'
-      ss.dependency 'CNPPopupController'
+      
+      s.dependency 'UMUtils/Core'
   end
 
   s.subspec 'APIModel' do |ss|

@@ -226,8 +226,14 @@ open class AlertView: UIContainer.View {
     
     open func rounder(actionView: UIView) -> RounderView {
         return RounderView(actionView, radius: 4)
-            .border(color: actionView.borderColor)
-            .border(width: actionView.borderWidth)
+            .border(color: {
+                guard let cgColor = actionView.layer.borderColor else {
+                    return nil
+                }
+
+                return UIColor(cgColor: cgColor)
+            }())
+            .border(width: actionView.layer.borderWidth)
     }
 
     @objc
