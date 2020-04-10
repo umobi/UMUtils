@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'UMUtils'
-  s.version          = '1.1.0'
+  s.version          = '1.1.1'
   s.summary          = "Utility Class Library"
 
 # This description is used to generate tags and improve search results.
@@ -28,59 +28,59 @@ TODO: Add long description of the pod here.
 
   s.ios.deployment_target = '10.0'
   s.swift_version = '5.1'
-  
-  s.source_files = 'Sources/**/*'
+
+  s.default_subspec = "Core"
 
   s.subspec 'Core' do |ss|
-      ss.source_files = 'Sources/Core/**/*.swift'
+      ss.source_files = 'Sources/UMUtils/**/*.swift'
   end
   
-  s.subspec 'MaterialUtils' do |ss|
-      ss.source_files = 'Sources/MaterialUtils/**/*.swift'
+  s.subspec 'UMMaterial' do |ss|
+      ss.source_files = 'Sources/UMMaterial/**/*.swift'
 
       ss.dependency 'UMUtils/Core'
       ss.dependency 'Material', '~> 3.1.8'
       ss.dependency 'ConstraintBuilder', "~> 1.0.2"
   end
   
-  s.subspec 'View' do |ss|
-      ss.source_files = 'Sources/View/**/*.swift'
+  s.subspec 'UMView' do |ss|
+      ss.source_files = 'Sources/UMView/**/*.swift'
 
       ss.dependency 'UMUtils/Core'
       ss.dependency 'ConstraintBuilder', "~> 1.0.2"
       ss.dependency 'UIContainer', '~> 1.2.0-beta.9'
   end
 
-  s.subspec 'Rx' do |ss|
-      ss.source_files = 'Sources/Rx/*.swift'
+  s.subspec 'RxUMUtils' do |ss|
+      ss.source_files = 'Sources/RxUMUtils/*.swift'
       
       ss.dependency 'UMUtils/Core'
       ss.dependency 'RxSwift', '~> 5.0.0'
       ss.dependency 'RxCocoa', '~> 5.0.0'
   end
 
-  s.subspec 'RxAIFlatSwitch' do |ss|
-      ss.source_files = 'Sources/RxAIFlatSwitch/**/*.swift'
+  s.subspec 'RxUMAIFlatSwitch' do |ss|
+      ss.source_files = 'Sources/RxUMAIFlatSwitch/**/*.swift'
 
-      ss.dependency 'UMUtils/Rx'
+      ss.dependency 'UMUtils/RxUMUtils'
       ss.dependency 'AIFlatSwitch', "~> 1.0.7"
   end
 
-  s.subspec 'RxActivity' do |ss|
-      ss.source_files = 'Sources/RxActivity/**/*.swift'
+  s.subspec 'RxUMActivity' do |ss|
+      ss.source_files = 'Sources/RxUMActivity/**/*.swift'
 
-      ss.dependency 'UMUtils/Rx'
+      ss.dependency 'UMUtils/RxUMUtils'
       ss.dependency 'UIContainer', '~> 1.2.0-beta.9'
   end
   
-  s.subspec 'ViewModel' do |s|
-      s.source_files = 'Sources/ViewModel/**/*.swift'
+  s.subspec 'UMViewModel' do |s|
+      s.source_files = 'Sources/UMViewModel/**/*.swift'
       
       s.dependency 'UMUtils/Core'
   end
 
-  s.subspec 'APIModel' do |ss|
-      ss.source_files = 'Sources/APIModel/**/*.swift'
+  s.subspec 'UMAPIModel' do |ss|
+      ss.source_files = 'Sources/UMAPIModel/**/*.swift'
       ss.dependency 'Moya', "~> 14.0.0"
       ss.dependency 'RxSwift', '~> 5.0.0'
       ss.dependency 'RxCocoa', '~> 5.0.0'
