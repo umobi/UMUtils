@@ -31,56 +31,56 @@ TODO: Add long description of the pod here.
   
   s.source_files = 'Sources/**/*'
 
-  s.subspec 'Core' do |ss|
-      ss.source_files = 'Sources/Core/**/*.swift'
+  s.subspec 'UMCore' do |ss|
+      ss.source_files = 'Sources/UMCore/**/*.swift'
   end
   
-  s.subspec 'MaterialUtils' do |ss|
-      ss.source_files = 'Sources/MaterialUtils/**/*.swift'
+  s.subspec 'UMMaterial' do |ss|
+      ss.source_files = 'Sources/UMMaterial/**/*.swift'
 
-      ss.dependency 'UMUtils/Core'
+      ss.dependency 'UMUtils/UMCore'
       ss.dependency 'Material', '~> 3.1.8'
       ss.dependency 'ConstraintBuilder', "~> 1.0.2"
   end
   
-  s.subspec 'View' do |ss|
-      ss.source_files = 'Sources/View/**/*.swift'
+  s.subspec 'UMView' do |ss|
+      ss.source_files = 'Sources/UMView/**/*.swift'
 
-      ss.dependency 'UMUtils/Core'
+      ss.dependency 'UMUtils/UMCore'
       ss.dependency 'ConstraintBuilder', "~> 1.0.2"
       ss.dependency 'UIContainer', '~> 1.2.0-beta.9'
   end
 
-  s.subspec 'Rx' do |ss|
-      ss.source_files = 'Sources/Rx/*.swift'
+  s.subspec 'RxUMUtils' do |ss|
+      ss.source_files = 'Sources/RxUMUtils/*.swift'
       
-      ss.dependency 'UMUtils/Core'
+      ss.dependency 'UMUtils/UMCore'
       ss.dependency 'RxSwift', '~> 5.0.0'
       ss.dependency 'RxCocoa', '~> 5.0.0'
   end
 
-  s.subspec 'RxAIFlatSwitch' do |ss|
-      ss.source_files = 'Sources/RxAIFlatSwitch/**/*.swift'
+  s.subspec 'RxUMAIFlatSwitch' do |ss|
+      ss.source_files = 'Sources/RxUMAIFlatSwitch/**/*.swift'
 
-      ss.dependency 'UMUtils/Rx'
+      ss.dependency 'UMUtils/RxUMUtils'
       ss.dependency 'AIFlatSwitch', "~> 1.0.7"
   end
 
-  s.subspec 'RxActivity' do |ss|
-      ss.source_files = 'Sources/RxActivity/**/*.swift'
+  s.subspec 'RxUMActivity' do |ss|
+      ss.source_files = 'Sources/RxUMActivity/**/*.swift'
 
-      ss.dependency 'UMUtils/Rx'
+      ss.dependency 'UMUtils/RxUMUtils'
       ss.dependency 'UIContainer', '~> 1.2.0-beta.9'
   end
   
-  s.subspec 'ViewModel' do |s|
-      s.source_files = 'Sources/ViewModel/**/*.swift'
+  s.subspec 'UMViewModel' do |s|
+      s.source_files = 'Sources/UMViewModel/**/*.swift'
       
-      s.dependency 'UMUtils/Core'
+      s.dependency 'UMUtils/UMCore'
   end
 
-  s.subspec 'APIModel' do |ss|
-      ss.source_files = 'Sources/APIModel/**/*.swift'
+  s.subspec 'UMAPIModel' do |ss|
+      ss.source_files = 'Sources/UMAPIModel/**/*.swift'
       ss.dependency 'Moya', "~> 14.0.0"
       ss.dependency 'RxSwift', '~> 5.0.0'
       ss.dependency 'RxCocoa', '~> 5.0.0'

@@ -12,14 +12,14 @@ let package = Package(
     products: [
         // Products define the executables and libraries produced by a package, and make them visible to other packages.
         .library(name: "UMUtils", targets: ["UMUtils"]),
-        .library(name: "Core", targets: ["UMUtils"]),
-        .library(name: "MaterialUtils", targets: ["UMUtils"]),
-        .library(name: "View", targets: ["UMUtils"]),
-        .library(name: "Rx", targets: ["UMUtils"]),
-        .library(name: "RxAIFlatSwitch", targets: ["UMUtils"]),
-        .library(name: "RxActivity", targets: ["UMUtils"]),
-        .library(name: "ViewModel", targets: ["UMUtils"]),
-        .library(name: "APIModel", targets: ["UMUtils"])
+        .library(name: "UMCore", targets: ["UMUtils"]),
+        .library(name: "UMMaterial", targets: ["UMUtils"]),
+        .library(name: "UMView", targets: ["UMUtils"]),
+        .library(name: "RxUMUtils", targets: ["UMUtils"]),
+        .library(name: "RxUMAIFlatSwitch", targets: ["UMUtils"]),
+        .library(name: "RxUMActivity", targets: ["UMUtils"]),
+        .library(name: "UMViewModel", targets: ["UMUtils"]),
+        .library(name: "UMAPIModel", targets: ["UMUtils"])
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -36,64 +36,64 @@ let package = Package(
         .target(
             name: "UMUtils",
             dependencies: [
-                "UMUtils/Core", "UMUtils/MaterialUtils", "UMUtils/View",
-                "UMUtils/Rx", "UMUtils/RxAIFlatSwitch", "UMUtils/RxActivity",
-                "UMUtils/ViewModel", "UMUtils/APIModel"
+                "UMCore", "UMMaterial", "UMView",
+                "RxUMUtils", "RxUMAIFlatSwitch", "RxUMActivity",
+                "UMViewModel", "UMAPIModel"
             ]
         ),
 
         .target(
-            name: "UMUtils/Core",
+            name: "UMCore",
             dependencies: [],
-            path: "Sources/Core"
+            path: "Sources/UMCore"
         ),
 
         .target(
-            name: "UMUtils/MaterialUtils",
-            dependencies: ["Material", "UMUtils/Core", "ConstraintBuilder"],
-            path: "Sources/MaterialUtils"
+            name: "UMMaterial",
+            dependencies: ["Material", "UMCore", "ConstraintBuilder"],
+            path: "Sources/UMMaterial"
         ),
 
         .target(
-            name: "UMUtils/View",
-            dependencies: ["ConstraintBuilder", "UMUtils/Core", "UIContainer"],
-            path: "Sources/View"
+            name: "UMView",
+            dependencies: ["ConstraintBuilder", "UMCore", "UIContainer"],
+            path: "Sources/UMView"
         ),
 
         .target(
-            name: "UMUtils/Rx",
+            name: "RxUMUtils",
             dependencies: [
-                "RxSwift", "UMUtils/Core",
+                "RxSwift", "UMCore",
                 .product(name: "RxCocoa", package: "RxSwift")
             ],
-            path: "Sources/Rx"
+            path: "Sources/RxUMUtils"
         ),
 
         .target(
-            name: "UMUtils/RxAIFlatSwitch",
-            dependencies: ["UMUtils/Rx", "AIFlatSwitch"],
-            path: "Sources/RxAIFlatSwitch"
+            name: "RxUMAIFlatSwitch",
+            dependencies: ["RxUMUtils", "AIFlatSwitch"],
+            path: "Sources/RxUMAIFlatSwitch"
         ),
 
         .target(
-            name: "UMUtils/RxActivity",
-            dependencies: ["UMUtils/Rx", "UIContainer"],
-            path: "Sources/RxActivity"
+            name: "RxUMActivity",
+            dependencies: ["RxUMUtils", "UIContainer"],
+            path: "Sources/RxUMActivity"
         ),
 
         .target(
-            name: "UMUtils/ViewModel",
-            dependencies: ["UMUtils/Core"],
-            path: "Sources/ViewModel"
+            name: "UMViewModel",
+            dependencies: ["UMCore"],
+            path: "Sources/UMViewModel"
         ),
 
         .target(
-            name: "UMUtils/APIModel",
+            name: "UMAPIModel",
             dependencies: [
                 "Moya", "RxSwift",
                 .product(name: "RxCocoa", package: "RxSwift")
             ],
-            path: "Sources/APIModel"
+            path: "Sources/UMAPIModel"
         ),
         
         .testTarget(
