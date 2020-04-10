@@ -21,6 +21,7 @@
 //
 
 import Foundation
+import UIKit
 
 public extension NSAttributedString {
     func boldify(with string: String) -> NSAttributedString {

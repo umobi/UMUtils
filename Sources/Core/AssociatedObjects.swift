@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+import Foundation
+
 public var AssociatedKey: UInt = 0
 
 public final class ObjectAssociation<T> {
