@@ -22,7 +22,7 @@
 
 import Foundation
 
-extension Date.Style {
+public extension Date.Style {
     struct WeekDay {
         private let date: Date
 
