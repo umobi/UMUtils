@@ -25,7 +25,7 @@ import UIKit
 import Material
 
 #if !COCOAPODS
-import UMCore
+import UMUtils
 #endif
 
 public extension TransitionController {

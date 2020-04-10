@@ -26,7 +26,7 @@ import RxCocoa
 import RxSwift
 
 #if !COCOAPODS
-import UMCore
+import UMUtils
 #endif
 
 private var kTextFieldDisposeBag: UInt = 0

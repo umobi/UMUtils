@@ -24,7 +24,7 @@ import RxCocoa
 import RxSwift
 
 #if !COCOAPODS
-import UMCore
+import UMUtils
 #endif
 
 // MARK: - isSucceeded()

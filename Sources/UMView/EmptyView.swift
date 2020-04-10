@@ -25,7 +25,7 @@ import ConstraintBuilder
 import UIContainer
 
 #if !COCOAPODS
-import UMCore
+import UMUtils
 #endif
 
 @available(*, deprecated, message: "Use DZNEmptyDataSet")

@@ -27,7 +27,7 @@ import CoreLocation
 #endif
 
 #if !COCOAPODS
-import UMCore
+import UMUtils
 #endif
 
 extension CLLocationManager: HasDelegate {

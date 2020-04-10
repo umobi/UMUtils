@@ -23,7 +23,7 @@
 import Foundation
 
 #if !COCOAPODS
-import UMCore
+import UMUtils
 #endif
 
 open class APIArray<Element: Decodable>: Decodable {

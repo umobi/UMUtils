@@ -26,7 +26,7 @@ import RxSwift
 import UIKit
 
 #if !COCOAPODS
-import UMCore
+import UMUtils
 #endif
 
 public extension Reactive where Base: UIScrollView {

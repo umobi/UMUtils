@@ -26,7 +26,7 @@ import UIContainer
 import UIKit
 
 #if !COCOAPODS
-import UMCore
+import UMUtils
 #endif
 
 open class AlertView: UIContainer.View {

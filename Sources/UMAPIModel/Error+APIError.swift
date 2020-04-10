@@ -24,7 +24,7 @@ import Foundation
 import Moya
 
 #if !COCOAPODS
-import UMCore
+import UMUtils
 #endif
 
 public extension Swift.Error {

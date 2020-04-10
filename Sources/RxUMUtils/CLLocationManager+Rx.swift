@@ -27,7 +27,7 @@ import CoreLocation
 #endif
 
 #if !COCOAPODS
-import UMCore
+import UMUtils
 #endif
 
 extension Reactive where Base: CLLocationManager {

@@ -25,7 +25,7 @@ import RxSwift
 import RxCocoa
 
 #if !COCOAPODS
-import UMCore
+import UMUtils
 #endif
 
 public extension ObservableType where Element == Moya.Response {

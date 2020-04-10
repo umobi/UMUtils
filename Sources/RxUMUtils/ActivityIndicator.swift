@@ -25,7 +25,7 @@ import RxSwift
 import RxCocoa
 
 #if !COCOAPODS
-import UMCore
+import UMUtils
 #endif
 
 private struct ActivityToken<Element>: ObservableConvertibleType, Disposable {

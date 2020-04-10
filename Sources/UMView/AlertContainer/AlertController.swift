@@ -26,7 +26,7 @@ import UIContainer
 import ConstraintBuilder
 
 #if !COCOAPODS
-import UMCore
+import UMUtils
 #endif
 
 extension AlertView {

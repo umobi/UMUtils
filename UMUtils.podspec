@@ -28,17 +28,17 @@ TODO: Add long description of the pod here.
 
   s.ios.deployment_target = '10.0'
   s.swift_version = '5.1'
-  
-  s.source_files = 'Sources/**/*'
 
-  s.subspec 'UMCore' do |ss|
-      ss.source_files = 'Sources/UMCore/**/*.swift'
+  s.default_subspec = "Core"
+
+  s.subspec 'Core' do |ss|
+      ss.source_files = 'Sources/UMUtils/**/*.swift'
   end
   
   s.subspec 'UMMaterial' do |ss|
       ss.source_files = 'Sources/UMMaterial/**/*.swift'
 
-      ss.dependency 'UMUtils/UMCore'
+      ss.dependency 'UMUtils/Core'
       ss.dependency 'Material', '~> 3.1.8'
       ss.dependency 'ConstraintBuilder', "~> 1.0.2"
   end
@@ -46,7 +46,7 @@ TODO: Add long description of the pod here.
   s.subspec 'UMView' do |ss|
       ss.source_files = 'Sources/UMView/**/*.swift'
 
-      ss.dependency 'UMUtils/UMCore'
+      ss.dependency 'UMUtils/Core'
       ss.dependency 'ConstraintBuilder', "~> 1.0.2"
       ss.dependency 'UIContainer', '~> 1.2.0-beta.9'
   end
@@ -54,7 +54,7 @@ TODO: Add long description of the pod here.
   s.subspec 'RxUMUtils' do |ss|
       ss.source_files = 'Sources/RxUMUtils/*.swift'
       
-      ss.dependency 'UMUtils/UMCore'
+      ss.dependency 'UMUtils/Core'
       ss.dependency 'RxSwift', '~> 5.0.0'
       ss.dependency 'RxCocoa', '~> 5.0.0'
   end
@@ -76,7 +76,7 @@ TODO: Add long description of the pod here.
   s.subspec 'UMViewModel' do |s|
       s.source_files = 'Sources/UMViewModel/**/*.swift'
       
-      s.dependency 'UMUtils/UMCore'
+      s.dependency 'UMUtils/Core'
   end
 
   s.subspec 'UMAPIModel' do |ss|

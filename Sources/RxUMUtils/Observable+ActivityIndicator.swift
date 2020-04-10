@@ -24,7 +24,7 @@ import RxCocoa
 import RxSwift
 
 #if !COCOAPODS
-import UMCore
+import UMUtils
 #endif
 
 public typealias ActivityIndicatorFilter = (activityIndicator: ActivityIndicator, condition: Bool)

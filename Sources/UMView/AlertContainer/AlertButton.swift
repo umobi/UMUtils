@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 
 #if !COCOAPODS
-import UMCore
+import UMUtils
 #endif
 
 public class AlertButton: UIButton {

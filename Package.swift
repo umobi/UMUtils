@@ -12,7 +12,6 @@ let package = Package(
     products: [
         // Products define the executables and libraries produced by a package, and make them visible to other packages.
         .library(name: "UMUtils", targets: ["UMUtils"]),
-        .library(name: "UMCore", targets: ["UMUtils"]),
         .library(name: "UMMaterial", targets: ["UMUtils"]),
         .library(name: "UMView", targets: ["UMUtils"]),
         .library(name: "RxUMUtils", targets: ["UMUtils"]),
@@ -35,35 +34,25 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "UMUtils",
-            dependencies: [
-                "UMCore", "UMMaterial", "UMView",
-                "RxUMUtils", "RxUMAIFlatSwitch", "RxUMActivity",
-                "UMViewModel", "UMAPIModel"
-            ]
-        ),
-
-        .target(
-            name: "UMCore",
-            dependencies: [],
-            path: "Sources/UMCore"
+            dependencies: []
         ),
 
         .target(
             name: "UMMaterial",
-            dependencies: ["Material", "UMCore", "ConstraintBuilder"],
+            dependencies: ["Material", "UMUtils", "ConstraintBuilder"],
             path: "Sources/UMMaterial"
         ),
 
         .target(
             name: "UMView",
-            dependencies: ["ConstraintBuilder", "UMCore", "UIContainer"],
+            dependencies: ["ConstraintBuilder", "UMUtils", "UIContainer"],
             path: "Sources/UMView"
         ),
 
         .target(
             name: "RxUMUtils",
             dependencies: [
-                "RxSwift", "UMCore",
+                "RxSwift", "UMUtils",
                 .product(name: "RxCocoa", package: "RxSwift")
             ],
             path: "Sources/RxUMUtils"
@@ -83,7 +72,7 @@ let package = Package(
 
         .target(
             name: "UMViewModel",
-            dependencies: ["UMCore"],
+            dependencies: ["UMUtils"],
             path: "Sources/UMViewModel"
         ),
 

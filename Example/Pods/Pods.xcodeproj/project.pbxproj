@@ -82,7 +82,6 @@
 		0C36D5EC2440E1020062752A /* TransitionController+ViewControllers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C36D5A12440E1020062752A /* TransitionController+ViewControllers.swift */; };
 		0C36D5EF2440E7B70062752A /* AIFlatSwitch+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C36D5EE2440E7B70062752A /* AIFlatSwitch+Rx.swift */; };
 		0C36D5F22440E8E50062752A /* Activity+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C36D5F12440E8E50062752A /* Activity+Rx.swift */; };
-		0C36D5F52440ED2A0062752A /* EmptyFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C36D5F42440ED2A0062752A /* EmptyFile.swift */; };
 		1C55EF6627F11517308758F6C177B9F9 /* Pods-UMUtils_Tests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 619EBD0313DF282D278CCBC5685BF195 /* Pods-UMUtils_Tests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7B19FF07648E45275843C3B256629DD3 /* UMUtils-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 1878A3C78BFE5D6DBD5EAE30D598D70F /* UMUtils-dummy.m */; };
 		8B0AECEC203F19F3710C3C19D8E983AA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3212113385A8FBBDB272BD23C409FF61 /* Foundation.framework */; };
@@ -178,7 +177,6 @@
 		0C36D5A12440E1020062752A /* TransitionController+ViewControllers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TransitionController+ViewControllers.swift"; sourceTree = "<group>"; };
 		0C36D5EE2440E7B70062752A /* AIFlatSwitch+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AIFlatSwitch+Rx.swift"; sourceTree = "<group>"; };
 		0C36D5F12440E8E50062752A /* Activity+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Activity+Rx.swift"; sourceTree = "<group>"; };
-		0C36D5F42440ED2A0062752A /* EmptyFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyFile.swift; sourceTree = "<group>"; };
 		15FA65862D6366C8644922081EDBF6BF /* UMUtils-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = "UMUtils-Info.plist"; path = "../Target Support Files/UMUtils/UMUtils-Info.plist"; sourceTree = "<group>"; };
 		1878A3C78BFE5D6DBD5EAE30D598D70F /* UMUtils-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UMUtils-dummy.m"; path = "../Target Support Files/UMUtils/UMUtils-dummy.m"; sourceTree = "<group>"; };
 		1E29203DE8839D79DBEB13064CE175A7 /* Pods-UMUtils_Tests-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-UMUtils_Tests-frameworks.sh"; sourceTree = "<group>"; };
@@ -281,20 +279,6 @@
 				0C36D5662440E1010062752A /* String+Utils.swift */,
 			);
 			path = TextFieldHelpers;
-			sourceTree = "<group>";
-		};
-		0C36D56F2440E1010062752A /* UMCore */ = {
-			isa = PBXGroup;
-			children = (
-				0C36D5702440E1010062752A /* DateComponents */,
-				0C36D5762440E1010062752A /* AssociatedObjects.swift */,
-				0C36D5772440E1010062752A /* Views */,
-				0C36D57A2440E1010062752A /* Categories */,
-				0C36D5972440E1010062752A /* LayoutConstraint.swift */,
-				0C36D5982440E1010062752A /* OrderedArray.swift */,
-			);
-			name = UMCore;
-			path = ../../Sources/UMCore;
 			sourceTree = "<group>";
 		};
 		0C36D5702440E1010062752A /* DateComponents */ = {
@@ -404,7 +388,12 @@
 		0C36D5F32440ED190062752A /* UMUtils */ = {
 			isa = PBXGroup;
 			children = (
-				0C36D5F42440ED2A0062752A /* EmptyFile.swift */,
+				0C36D5702440E1010062752A /* DateComponents */,
+				0C36D5762440E1010062752A /* AssociatedObjects.swift */,
+				0C36D5772440E1010062752A /* Views */,
+				0C36D57A2440E1010062752A /* Categories */,
+				0C36D5972440E1010062752A /* LayoutConstraint.swift */,
+				0C36D5982440E1010062752A /* OrderedArray.swift */,
 			);
 			name = UMUtils;
 			path = ../../Sources/UMUtils;
@@ -448,7 +437,6 @@
 			isa = PBXGroup;
 			children = (
 				0C36D5F32440ED190062752A /* UMUtils */,
-				0C36D56F2440E1010062752A /* UMCore */,
 				0C36D5A02440E1020062752A /* UMMaterial */,
 				0C36D5992440E1020062752A /* UMView */,
 				0C36D55B2440E1010062752A /* RxUMUtils */,
@@ -654,7 +642,6 @@
 				0C36D5A32440E1020062752A /* ViewModel.swift in Sources */,
 				0C36D5C32440E1020062752A /* Date+Style+Month.swift in Sources */,
 				0C36D5E42440E1020062752A /* UILabel+Boldify.swift in Sources */,
-				0C36D5F52440ED2A0062752A /* EmptyFile.swift in Sources */,
 				0C36D5D52440E1020062752A /* String+Validations.swift in Sources */,
 				0C36D5EA2440E1020062752A /* AlertButtonAction.swift in Sources */,
 				0C36D5AD2440E1020062752A /* Transform.swift in Sources */,
