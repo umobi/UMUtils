@@ -8,19 +8,8 @@
 
 Pod::Spec.new do |s|
   s.name             = 'UMUtils'
-  s.version          = '1.1.2'
+  s.version          = '1.1.3'
   s.summary          = "Utility Class Library"
-
-# This description is used to generate tags and improve search results.
-#   * Think: What does it do? Why did you write it? What is the focus?
-#   * Try to keep it short, snappy and to the point.
-#   * Write the description between the DESC delimiters below.
-#   * Finally, don't worry about the indent, CocoaPods strips it!
-
-  s.description      = <<-DESC
-TODO: Add long description of the pod here.
-                       DESC
-
   s.homepage         = 'https://github.com/umobi/UMUtils'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Ramon Vicente' => 'ramon@umobi.com.br', 'brennobemoura' => 'brenno@umobi.com.br' }
@@ -28,6 +17,10 @@ TODO: Add long description of the pod here.
 
   s.ios.deployment_target = '10.0'
   s.swift_version = '5.1'
+
+  s.description      = <<-DESC
+TODO: Add long description of the pod here.
+                       DESC
 
   s.default_subspec = "Core"
 
