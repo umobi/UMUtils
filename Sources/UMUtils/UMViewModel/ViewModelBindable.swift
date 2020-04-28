@@ -31,15 +31,13 @@ public protocol ViewModelBindable: class {
     func bindViewModel(viewModel: ViewModel)
 }
 
-private let viewModelAssociated = ObjectAssociation<ViewModel>(policy: .OBJC_ASSOCIATION_RETAIN)
+private let viewModelStruct = ObjectAssociation<ViewModel>(policy: .OBJC_ASSOCIATION_COPY)
+private let viewModelClass = ObjectAssociation<ViewModel>(policy: .OBJC_ASSOCIATION_RETAIN)
 
 extension ViewModelBindable {
 
     public var viewModel: ViewModel! {
-        
-        get {
-            return viewModelAssociated[self] as? ViewModel
-        }
+        get { (viewModelStruct[self] ?? viewModelClass[self]) as? ViewModel }
         
         set(newViewModel) {
             guard self.viewModel == nil else {
@@ -50,12 +48,17 @@ extension ViewModelBindable {
                 fatalError("[ViewModel] don't init view model with nil values")
             }
 
-            viewModelAssociated[self] = viewModel
+            if viewModel is NSCopying {
+                viewModelStruct[self] = viewModel
+            } else {
+                viewModelClass[self] = viewModel
+            }
             registerBinding(viewModel: viewModel)
         }
     }
     
     private func registerBinding(viewModel: ViewModel) {
+        viewModel.binders()
         bindViewModel(viewModel: viewModel)
     }
     
