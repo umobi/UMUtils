@@ -36,7 +36,7 @@ private let viewModelObject = ObjectAssociation<ViewModel>(policy: .OBJC_ASSOCIA
 extension ViewModelBindable {
 
     public var viewModel: ViewModel! {
-        get { viewModelObject[self] }
+        get { viewModelObject[self] as? ViewModel }
         
         set(newViewModel) {
             guard self.viewModel == nil else {
