@@ -22,7 +22,7 @@
 
 import Foundation
 
-public protocol ViewModel {
+public protocol ViewModel: class {
     func binders()
 }
 

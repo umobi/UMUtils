@@ -65,7 +65,7 @@ public class ActivityIndicator: SharedSequenceConvertibleType {
 
     // swiftlint:disable multiple_closures_with_trailing_closure
     fileprivate func trackActivityOfObservable<O: ObservableConvertibleType>(_ source: O) -> Observable<O.Element> {
-        return Observable.using({ () -> ActivityToken<O.Element> in
+        return Observable.using({ [unowned self] () -> ActivityToken<O.Element> in
             self.increment()
             return ActivityToken(source: source.asObservable(), disposeAction: self.decrement)
         }) { token in
