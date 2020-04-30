@@ -29,28 +29,3 @@ public protocol ViewModel: class {
 public extension ViewModel {
     func binders() {}
 }
-
-@propertyWrapper
-public struct UMProperty<Object> {
-    let box: UMMutableBox<Object>
-
-    public var wrappedValue: Object {
-        get { self.box.value }
-        nonmutating
-        set { self.box.value = newValue }
-    }
-    
-    public var projectedValue: UMProperty<Object> { return self }
-
-    public init(wrappedValue: Object) {
-        self.box = .init(wrappedValue)
-    }
-}
-
-public class UMMutableBox<Value> {
-    var value: Value
-
-    init(_ value: Value) {
-        self.value = value
-    }
-}
