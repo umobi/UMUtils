@@ -33,6 +33,20 @@ open class AlertView: UIView {
     // MARK: Image Alert
     public private(set) var imageView: UIImageView? = nil
 
+    public init() {
+        super.init(frame: .zero)
+        self.prepare()
+    }
+
+    public override init(frame: CGRect) {
+        super.init(frame: frame)
+        self.prepare()
+    }
+
+    public required init?(coder: NSCoder) {
+        fatalError()
+    }
+
     open var imageHeight: CGFloat = 175 {
         willSet {
             if imageView != nil {
@@ -258,9 +272,7 @@ open class AlertView: UIView {
             .dismiss(animated: true, completion: nil)
     }
     
-    override open func prepare() {
-        super.prepare()
-
+    open func prepare() {
         let content = UIStackView()
         let stack = UIStackView()
         let spacer = UICSpacerView(stack, spacing: self.margin)

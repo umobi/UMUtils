@@ -6,7 +6,6 @@ import PackageDescription
 let package = Package(
     name: "UMUtils",
     platforms: [
-        .macOS(.v10_12),
         .iOS(.v10)
     ],
     products: [
