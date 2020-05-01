@@ -33,11 +33,6 @@ open class AlertView: UIView {
     // MARK: Image Alert
     public private(set) var imageView: UIImageView? = nil
 
-    public init() {
-        super.init(frame: .zero)
-        self.prepare()
-    }
-
     public override init(frame: CGRect) {
         super.init(frame: frame)
         self.prepare()
@@ -254,7 +249,7 @@ open class AlertView: UIView {
     }
     
     open func rounder(actionView: UIView) -> UICRounderView {
-        return RounderView(actionView, radius: 4)
+        return UICRounderView(actionView, radius: 4)
             .border(color: {
                 guard let cgColor = actionView.layer.borderColor else {
                     return nil
@@ -275,7 +270,7 @@ open class AlertView: UIView {
     open func prepare() {
         let content = UIStackView()
         let stack = UIStackView()
-        let spacer = UICSpacerView(stack, spacing: self.margin)
+        let spacer = UICSpacerView(stack, margin: .init(spacing: self.margin))
 
         self.contentSV = content
         self.stackView = stack

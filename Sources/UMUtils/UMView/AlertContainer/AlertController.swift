@@ -25,6 +25,14 @@ import UIKit
 import UIContainer
 import ConstraintBuilder
 
+private var kViewController = 0
+extension AlertView: ContainerViewParent {
+    public var parent: UIViewController! {
+        get { objc_getAssociatedObject(self, &kViewController) as? UIViewController }
+        set { objc_setAssociatedObject(self, &kViewController, newValue, .OBJC_ASSOCIATION_ASSIGN) }
+    }
+}
+
 extension AlertView {
     class Container: ContainerView<AlertView> {
         override func spacer<T>(_ view: T) -> SpacerView where T : UIView {
