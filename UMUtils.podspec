@@ -41,7 +41,8 @@ TODO: Add long description of the pod here.
 
       ss.dependency 'UMUtils/Core'
       ss.dependency 'ConstraintBuilder', "~> 1.0.2"
-      ss.dependency 'UIContainer', '~> 1.2.0-beta.10'
+      ss.dependency 'UIContainer', '~> 1.2.0'
+      ss.dependency 'UICreator', '~> 1.0.0-alpha.10'
   end
 
   s.subspec 'RxUMUtils' do |ss|
@@ -63,7 +64,7 @@ TODO: Add long description of the pod here.
       ss.source_files = 'Sources/UMUtils/RxUMActivity/**/*.swift'
 
       ss.dependency 'UMUtils/RxUMUtils'
-      ss.dependency 'UIContainer', '~> 1.2.0-beta.10'
+      ss.dependency 'UIContainer', '~> 1.2.0'
   end
   
   s.subspec 'UMViewModel' do |s|

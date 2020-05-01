@@ -22,13 +22,13 @@
 
 import Foundation
 import ConstraintBuilder
-import UIContainer
+import UICreator
 import UIKit
 
-open class AlertView: UIContainer.View {
+open class AlertView: UIView {
     private var contentSV: UIStackView!
     private var stackView: UIStackView!
-    private weak var spacer: SpacerView!
+    private weak var spacer: UICSpacerView!
     
     // MARK: Image Alert
     public private(set) var imageView: UIImageView? = nil
@@ -77,7 +77,7 @@ open class AlertView: UIContainer.View {
             self.imageView?.image = image
         }
 
-        AddSubview(self.contentSV).insertArrangedSubview(self.imageView!, at: 0)
+        CBSubview(self.contentSV).insertArrangedSubview(self.imageView!, at: 0)
     }
     
     // MARK: Alert Title
@@ -106,7 +106,7 @@ open class AlertView: UIContainer.View {
 
         self.titleLabel?.text = text
 
-        AddSubview(self.contentSV).insertArrangedSubview(self.titleLabel!, at: self.position(for: 1))
+        CBSubview(self.contentSV).insertArrangedSubview(self.titleLabel!, at: self.position(for: 1))
     }
     
     // MARK: Alert Subtitle
@@ -153,11 +153,11 @@ open class AlertView: UIContainer.View {
         }
         
         if label.superview == nil {
-            AddSubview(stackView).insertArrangedSubview(label, at: stackView.subviews.count)
+            CBSubview(stackView).insertArrangedSubview(label, at: stackView.subviews.count)
         }
         
         if stackView.superview == nil {
-            AddSubview(self.contentSV).insertArrangedSubview(stackView, at: self.position(for: 3))
+            CBSubview(self.contentSV).insertArrangedSubview(stackView, at: self.position(for: 3))
         }
     }
     
@@ -192,7 +192,7 @@ open class AlertView: UIContainer.View {
 
         self.subtitleLabel?.text = text
 
-        AddSubview(self.contentSV).insertArrangedSubview(self.subtitleLabel!, at: self.position(for: 2))
+        CBSubview(self.contentSV).insertArrangedSubview(self.subtitleLabel!, at: self.position(for: 2))
     }
 
     // MARK: Position calculate the index for alertContainer
@@ -224,7 +224,7 @@ open class AlertView: UIContainer.View {
 
     open func addAction(action: AlertButton.Action) {
         if actionSV.superview == nil {
-            AddSubview(self.stackView).addArrangedSubview(actionSV)
+            CBSubview(self.stackView).addArrangedSubview(actionSV)
         }
         
         let view = action.asView()
@@ -236,10 +236,10 @@ open class AlertView: UIContainer.View {
             view.addGestureRecognizer(tapGesture)
         }
 
-        AddSubview(actionSV).insertArrangedSubview(self.rounder(actionView: view), at: 0)
+        CBSubview(actionSV).insertArrangedSubview(self.rounder(actionView: view), at: 0)
     }
     
-    open func rounder(actionView: UIView) -> RounderView {
+    open func rounder(actionView: UIView) -> UICRounderView {
         return RounderView(actionView, radius: 4)
             .border(color: {
                 guard let cgColor = actionView.layer.borderColor else {
@@ -253,7 +253,9 @@ open class AlertView: UIContainer.View {
 
     @objc
     private func tapOnAction(_ sender: UIButton) {
-        self.parent.dismiss(animated: true)
+        (sequence(first: self, next: { $0.next })
+            .first(where: { $0 is UIViewController }) as? UIViewController)?
+            .dismiss(animated: true, completion: nil)
     }
     
     override open func prepare() {
@@ -261,7 +263,7 @@ open class AlertView: UIContainer.View {
 
         let content = UIStackView()
         let stack = UIStackView()
-        let spacer = SpacerView(stack, spacing: self.margin)
+        let spacer = UICSpacerView(stack, spacing: self.margin)
 
         self.contentSV = content
         self.stackView = stack
@@ -272,9 +274,9 @@ open class AlertView: UIContainer.View {
             $0.spacing = self.spacing
         }
 
-        let scrollView = ScrollView(content, axis: .vertical)
-        AddSubview(self.stackView).addArrangedSubview(scrollView)
-        AddSubview(self).addSubview(spacer)
+        let scrollView = UICScrollView(content, axis: .vertical)
+        CBSubview(self.stackView).addArrangedSubview(scrollView)
+        CBSubview(self).addSubview(spacer)
 
         Constraintable.activate(
             spacer.cbuild
