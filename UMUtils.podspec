@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'UMUtils'
-  s.version          = '1.1.3'
+  s.version          = '1.1.4'
   s.summary          = "Utility Class Library"
   s.homepage         = 'https://github.com/umobi/UMUtils'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
@@ -45,7 +45,7 @@ TODO: Add long description of the pod here.
   end
 
   s.subspec 'RxUMUtils' do |ss|
-      ss.source_files = 'Sources/UMUtils/RxUMUtils/*.swift'
+      ss.source_files = 'Sources/UMUtils/RxUMUtils/**/*.swift'
       
       ss.dependency 'UMUtils/Core'
       ss.dependency 'RxSwift', '~> 5.0.0'
