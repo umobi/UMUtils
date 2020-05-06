@@ -45,7 +45,7 @@ TODO: Add long description of the pod here.
   end
 
   s.subspec 'RxUMUtils' do |ss|
-      ss.source_files = 'Sources/UMUtils/RxUMUtils/*.swift'
+      ss.source_files = 'Sources/UMUtils/RxUMUtils/**/*.swift'
       
       ss.dependency 'UMUtils/Core'
       ss.dependency 'RxSwift', '~> 5.0.0'
