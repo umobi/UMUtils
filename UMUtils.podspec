@@ -27,7 +27,7 @@ TODO: Add long description of the pod here.
   s.subspec 'Core' do |ss|
       ss.source_files = 'Sources/UMUtils/Core/**/*.swift'
   end
-  
+
   s.subspec 'UMMaterial' do |ss|
       ss.source_files = 'Sources/UMUtils/UMMaterial/**/*.swift'
 
@@ -35,24 +35,19 @@ TODO: Add long description of the pod here.
       ss.dependency 'Material', '>= 3.0.0', "< 4.0.0"
       ss.dependency 'ConstraintBuilder', '>= 1.0.2', "< 2.0.0"
   end
-  
+
   s.subspec 'UMView' do |ss|
       ss.source_files = 'Sources/UMUtils/UMView/**/*.swift'
 
       ss.dependency 'UMUtils/Core'
-<<<<<<< HEAD
-      ss.dependency 'ConstraintBuilder', "~> 1.0.2"
-      ss.dependency 'UIContainer', '~> 1.2.0'
-      ss.dependency 'UICreator', '~> 1.0.0-alpha.10'
-=======
       ss.dependency 'ConstraintBuilder', '>= 1.0.2', "< 2.0.0"
       ss.dependency 'UIContainer', '>= 1.2.0', "< 2.0.0"
->>>>>>> hotfix/1.1.5
+      ss.dependency 'UICreator', '~> 1.0.0-alpha.10'
   end
 
   s.subspec 'RxUMUtils' do |ss|
       ss.source_files = 'Sources/UMUtils/RxUMUtils/**/*.swift'
-      
+
       ss.dependency 'UMUtils/Core'
       ss.dependency 'RxSwift', '>= 5.0.0', "< 6.0.0"
       ss.dependency 'RxCocoa', '>= 5.0.0', "< 6.0.0"
@@ -69,16 +64,12 @@ TODO: Add long description of the pod here.
       ss.source_files = 'Sources/UMUtils/RxUMActivity/**/*.swift'
 
       ss.dependency 'UMUtils/RxUMUtils'
-<<<<<<< HEAD
-      ss.dependency 'UIContainer', '~> 1.2.0'
-=======
       ss.dependency 'UIContainer', '>= 1.2.0', "< 2.0.0"
->>>>>>> hotfix/1.1.5
   end
-  
+
   s.subspec 'UMViewModel' do |s|
       s.source_files = 'Sources/UMUtils/UMViewModel/**/*.swift'
-      
+
       s.dependency 'UMUtils/Core'
   end
 
