@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'UMUtils'
-  s.version          = '1.1.4'
+  s.version          = '1.1.5'
   s.summary          = "Utility Class Library"
   s.homepage         = 'https://github.com/umobi/UMUtils'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
@@ -32,38 +32,38 @@ TODO: Add long description of the pod here.
       ss.source_files = 'Sources/UMUtils/UMMaterial/**/*.swift'
 
       ss.dependency 'UMUtils/Core'
-      ss.dependency 'Material', '~> 3.1.8'
-      ss.dependency 'ConstraintBuilder', "~> 1.0.2"
+      ss.dependency 'Material', '>= 3.0.0', "< 4.0.0"
+      ss.dependency 'ConstraintBuilder', '>= 1.0.2', "< 2.0.0"
   end
   
   s.subspec 'UMView' do |ss|
       ss.source_files = 'Sources/UMUtils/UMView/**/*.swift'
 
       ss.dependency 'UMUtils/Core'
-      ss.dependency 'ConstraintBuilder', "~> 1.0.2"
-      ss.dependency 'UIContainer', '~> 1.2.0-beta.10'
+      ss.dependency 'ConstraintBuilder', '>= 1.0.2', "< 2.0.0"
+      ss.dependency 'UIContainer', '>= 1.2.0', "< 2.0.0"
   end
 
   s.subspec 'RxUMUtils' do |ss|
       ss.source_files = 'Sources/UMUtils/RxUMUtils/**/*.swift'
       
       ss.dependency 'UMUtils/Core'
-      ss.dependency 'RxSwift', '~> 5.0.0'
-      ss.dependency 'RxCocoa', '~> 5.0.0'
+      ss.dependency 'RxSwift', '>= 5.0.0', "< 6.0.0"
+      ss.dependency 'RxCocoa', '>= 5.0.0', "< 6.0.0"
   end
 
   s.subspec 'RxUMAIFlatSwitch' do |ss|
       ss.source_files = 'Sources/UMUtils/RxUMAIFlatSwitch/**/*.swift'
 
       ss.dependency 'UMUtils/RxUMUtils'
-      ss.dependency 'AIFlatSwitch', "~> 1.0.7"
+      ss.dependency 'AIFlatSwitch', ">= 1.0.7", "< 2.0.0"
   end
 
   s.subspec 'RxUMActivity' do |ss|
       ss.source_files = 'Sources/UMUtils/RxUMActivity/**/*.swift'
 
       ss.dependency 'UMUtils/RxUMUtils'
-      ss.dependency 'UIContainer', '~> 1.2.0-beta.10'
+      ss.dependency 'UIContainer', '>= 1.2.0', "< 2.0.0"
   end
   
   s.subspec 'UMViewModel' do |s|
@@ -74,9 +74,9 @@ TODO: Add long description of the pod here.
 
   s.subspec 'UMAPIModel' do |ss|
       ss.source_files = 'Sources/UMUtils/UMAPIModel/**/*.swift'
-      ss.dependency 'Moya', "~> 14.0.0"
-      ss.dependency 'RxSwift', '~> 5.0.0'
-      ss.dependency 'RxCocoa', '~> 5.0.0'
+      ss.dependency 'Moya', ">= 14.0.0", "< 15.0.0"
+      ss.dependency 'RxSwift', '>= 5.0.0', "< 6.0.0"
+      ss.dependency 'RxCocoa', '>= 5.0.0', "< 6.0.0"
   end
 
 end
