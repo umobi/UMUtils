@@ -28,7 +28,7 @@ import UIKit
 open class AlertView: UIView {
     private var contentSV: UIStackView!
     private var stackView: UIStackView!
-    private weak var spacer: UICSpacerView!
+    private weak var spacer: UICSpacer.View!
     
     // MARK: Image Alert
     public private(set) var imageView: UIImageView? = nil
@@ -248,8 +248,8 @@ open class AlertView: UIView {
         CBSubview(actionSV).insertArrangedSubview(self.rounder(actionView: view), at: 0)
     }
     
-    open func rounder(actionView: UIView) -> UICRounderView {
-        return UICRounderView(actionView, radius: 4)
+    open func rounder(actionView: UIView) -> UICRounder.View {
+        return UICRounder.View(actionView, radius: 4)
             .border(color: {
                 guard let cgColor = actionView.layer.borderColor else {
                     return nil
@@ -270,7 +270,7 @@ open class AlertView: UIView {
     open func prepare() {
         let content = UIStackView()
         let stack = UIStackView()
-        let spacer = UICSpacerView(stack, margin: .init(spacing: self.margin))
+        let spacer = UICSpacer.View(stack, margin: .init(spacing: self.margin))
 
         self.contentSV = content
         self.stackView = stack
@@ -281,7 +281,7 @@ open class AlertView: UIView {
             $0.spacing = self.spacing
         }
 
-        let scrollView = UICScrollView(content, axis: .vertical)
+        let scrollView = UICScroll.View(content, axis: .vertical)
         CBSubview(self.stackView).addArrangedSubview(scrollView)
         CBSubview(self).addSubview(spacer)
 

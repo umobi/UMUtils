@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'UMUtils'
-  s.version          = '1.1.5'
+  s.version          = '1.1.6'
   s.summary          = "Utility Class Library"
   s.homepage         = 'https://github.com/umobi/UMUtils'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
@@ -42,7 +42,7 @@ TODO: Add long description of the pod here.
       ss.dependency 'UMUtils/Core'
       ss.dependency 'ConstraintBuilder', '>= 1.0.2', "< 2.0.0"
       ss.dependency 'UIContainer', '>= 1.2.0', "< 2.0.0"
-      ss.dependency 'UICreator', '~> 1.0.0-alpha.10'
+      ss.dependency 'UICreator', '1.0.0-alpha.11'
   end
 
   s.subspec 'RxUMUtils' do |ss|
