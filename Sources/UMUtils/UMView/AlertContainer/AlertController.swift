@@ -24,6 +24,7 @@ import Foundation
 import UIKit
 import UIContainer
 import ConstraintBuilder
+import UICreator
 
 private var kViewController = 0
 extension AlertView: ContainerViewParent {
@@ -35,59 +36,58 @@ extension AlertView: ContainerViewParent {
 
 extension AlertView {
     class Container: ContainerView<AlertView> {
-        override func spacer<T>(_ view: T) -> SpacerView where T : UIView {
-            return .init({
-                let contentView = UIView()
+        override func loadView<T>(_ view: T) -> CBView where T : CBView {
+            let contentView = UIView()
 
-                if #available(iOS 11.0, *) {
-                    contentView.insetsLayoutMarginsFromSafeArea = true
-                }
-                
-                if let fadeView = self.view.fadeView {
-                    AddSubview(contentView).addSubview(fadeView)
+            if #available(iOS 11.0, *) {
+                contentView.insetsLayoutMarginsFromSafeArea = true
+            }
 
-                    Constraintable.activate(
-                        fadeView.cbuild
-                            .edges
-                    )
-                }
-                
-                if self.view.useBlur {
-                    let blurView = BlurView(blur: self.view.blurEffectStyle)
-                    AddSubview(contentView).addSubview(blurView)
-
-                    Constraintable.activate(
-                        blurView.cbuild
-                            .edges
-                    )
-                }
-
-                let centerView = ContentView.Center(
-                    RounderView(view, radius: view.layer.cornerRadius)
-                )
-
-                AddSubview(contentView).addSubview(centerView)
+            if let fadeView = self.view.fadeView {
+                CBSubview(contentView).addSubview(fadeView)
 
                 Constraintable.activate(
-                    centerView.cbuild
-                        .top
-                        .equalTo(contentView.cbuild.topMargin),
-
-                    centerView.cbuild
-                        .bottom
-                        .equalTo(contentView.cbuild.bottomMargin),
-
-                    centerView.cbuild
-                        .leading
-                        .trailing
-                        .equalTo(0)
+                    fadeView.cbuild
+                        .edges
                 )
-                
-                let tap = UITapGestureRecognizer(target: self, action: #selector(self.tapOnBackground))
-                contentView.addGestureRecognizer(tap)
-                
-                return contentView
-            }(), spacing: 0)
+            }
+
+            if self.view.useBlur {
+                let blurView = BlurView(blur: self.view.blurEffectStyle)
+                CBSubview(contentView).addSubview(blurView)
+
+                Constraintable.activate(
+                    blurView.cbuild
+                        .edges
+                )
+            }
+
+            let centerView = ContentView(
+                RounderView(view, radius: view.layer.cornerRadius),
+                contentMode: .center
+            )
+
+            CBSubview(contentView).addSubview(centerView)
+
+            Constraintable.activate(
+                centerView.cbuild
+                    .top
+                    .equalTo(contentView.cbuild.topMargin),
+
+                centerView.cbuild
+                    .bottom
+                    .equalTo(contentView.cbuild.bottomMargin),
+
+                centerView.cbuild
+                    .leading
+                    .trailing
+                    .equalTo(0)
+            )
+
+            let tap = UITapGestureRecognizer(target: self, action: #selector(self.tapOnBackground))
+            contentView.addGestureRecognizer(tap)
+
+            return contentView
         }
         
         @objc func tapOnBackground() {
@@ -112,7 +112,7 @@ extension AlertView: ViewControllerType {
     public var content: ViewControllerMaker {
         .dynamic {
             let containerView = AlertView.Container.init(in: $0, loadHandler: { self })
-            AddSubview($0.view).addSubview(containerView)
+            CBSubview($0.view).addSubview(containerView)
 
             Constraintable.activate(
                 containerView.cbuild
