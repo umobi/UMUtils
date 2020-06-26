@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'UMUtils'
-  s.version          = '1.1.6'
+  s.version          = '1.2.0'
   s.summary          = "Utility Class Library"
   s.homepage         = 'https://github.com/umobi/UMUtils'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
@@ -33,15 +33,15 @@ TODO: Add long description of the pod here.
 
       ss.dependency 'UMUtils/Core'
       ss.dependency 'Material', '>= 3.0.0', "< 4.0.0"
-      ss.dependency 'ConstraintBuilder', '>= 1.0.2', "< 2.0.0"
+      ss.dependency 'ConstraintBuilder', '>= 1.0.6', "< 2.0.0"
   end
 
   s.subspec 'UMView' do |ss|
       ss.source_files = 'Sources/UMUtils/UMView/**/*.swift'
 
       ss.dependency 'UMUtils/Core'
-      ss.dependency 'ConstraintBuilder', '>= 1.0.2', "< 2.0.0"
-      ss.dependency 'UIContainer', '>= 1.2.0', "< 2.0.0"
+      ss.dependency 'ConstraintBuilder', '>= 1.0.6', "< 2.0.0"
+      ss.dependency 'UIContainer', '>= 2.0.0', "< 3.0.0"
       ss.dependency 'UICreator', '1.0.0-alpha.11'
   end
 
@@ -64,7 +64,7 @@ TODO: Add long description of the pod here.
       ss.source_files = 'Sources/UMUtils/RxUMActivity/**/*.swift'
 
       ss.dependency 'UMUtils/RxUMUtils'
-      ss.dependency 'UIContainer', '>= 1.2.0', "< 2.0.0"
+      ss.dependency 'UIContainer', '>= 2.0.0', "< 3.0.0"
   end
 
   s.subspec 'UMViewModel' do |s|
