@@ -23,6 +23,7 @@
 import UIKit
 import ConstraintBuilder
 import UIContainer
+import UICreator
 
 @available(*, deprecated, message: "Use DZNEmptyDataSet")
 public class EmptyView: UIView {
@@ -168,7 +169,7 @@ fileprivate extension EmptyView {
         stackView.spacing = 30
 
         let scroll = ScrollView(stackView, axis: .vertical)
-        AddSubview(self).addSubview(scroll)
+        CBSubview(self).addSubview(scroll)
         self.stackView = stackView
 
         Constraintable.activate(
@@ -197,14 +198,14 @@ fileprivate extension EmptyView {
         imageView.layer.borderColor = UIColor.lightGray.cgColor
         imageView.layer.borderWidth = 3
 
-        AddSubview(self.imageContainer).addSubview(imageView)
+        CBSubview(self.imageContainer).addSubview(imageView)
 
         return imageView
     }
 
     func prepareImageView() {
         let containerView = UIView()
-        AddSubview(self.stackView).addArrangedSubview(containerView)
+        CBSubview(self.stackView).addArrangedSubview(containerView)
         self.imageContainer = containerView
 
         self.imageView = self.createImageView()
@@ -242,7 +243,7 @@ fileprivate extension EmptyView {
 
         title.lockResizeLayout()
 
-        AddSubview(self.stackView).addArrangedSubview(title)
+        CBSubview(self.stackView).addArrangedSubview(title)
 
         self.titleLabel = title
     }
@@ -258,7 +259,7 @@ fileprivate extension EmptyView {
 
         message.lockResizeLayout()
 
-        AddSubview(self.stackView).addArrangedSubview(message)
+        CBSubview(self.stackView).addArrangedSubview(message)
 
         self.messageLabel = message
     }
@@ -286,7 +287,7 @@ fileprivate extension EmptyView {
         self.actionButton = actionButton
 
         let containerView = UIView()
-        AddSubview(self.stackView).addArrangedSubview(containerView)
+        CBSubview(self.stackView).addArrangedSubview(containerView)
         self.actionContainer = containerView
 
         Constraintable.activate(
@@ -296,7 +297,7 @@ fileprivate extension EmptyView {
                 .priority(.defaultLow)
         )
 
-        AddSubview(containerView).addSubview(actionButton)
+        CBSubview(containerView).addSubview(actionButton)
 
 
         Constraintable.activate(
@@ -371,7 +372,7 @@ public protocol EmptyPayload {
 private class Box: UIView {
     init(_ view: UIView) {
         super.init(frame: .zero)
-        AddSubview(self).addSubview(view)
+        CBSubview(self).addSubview(view)
 
         Constraintable.activate(
             view.cbuild
@@ -469,7 +470,7 @@ public class EmptyFactory<View: UIView & EmptyPayload> {
 
         if let customView = self.payload.customView?() {
             let box = Box(customView)
-            AddSubview(emptyView).addSubview(box)
+            UIView.CBSubview(emptyView).addSubview(box)
             Constraintable.activate(
                 box.cbuild
                     .edges
@@ -513,8 +514,8 @@ public class EmptyFactory<View: UIView & EmptyPayload> {
         }()
 
         let emptyView = View()
-        let box = Box(ContentView.Center(emptyView))
-        AddSubview(contentView).addSubview(box)
+        let box = Box(ContentView(emptyView, contentMode: .center))
+        UIView.CBSubview(contentView).addSubview(box)
         Constraintable.activate(
             box.cbuild
                 .edges

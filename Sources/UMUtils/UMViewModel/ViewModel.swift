@@ -22,4 +22,10 @@
 
 import Foundation
 
-public protocol ViewModel: class {}
+public protocol ViewModel: class {
+    func binders()
+}
+
+public extension ViewModel {
+    func binders() {}
+}

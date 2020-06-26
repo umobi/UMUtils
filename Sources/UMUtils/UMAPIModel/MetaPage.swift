@@ -35,6 +35,7 @@ public class MetaPage: Codable {
     public let startIndex: Int
     public let lastPage: Int
     public let count: Int
+    public let total: Int
     public let status: MetaPageStatus
     public let firstPage: Int
 
@@ -45,6 +46,7 @@ public class MetaPage: Codable {
         self.startIndex = try container.decode(.startIndex)
         self.lastPage = try container.decode(.lastPage)
         self.count = try container.decode(.count)
+        self.total = try container.decode(.total)
         self.firstPage = 1
 
         if currentPage == lastPage {
@@ -60,6 +62,7 @@ public class MetaPage: Codable {
         self.startIndex = 0
         self.lastPage = 0
         self.count = 0
+        self.total = 0
         self.firstPage = 0
         self.status = .empty
     }
@@ -96,6 +99,7 @@ public class MetaPage: Codable {
         self.lastPage = original.lastPage
         self.count = original.count
         self.status = editable.status
+        self.total = original.total
         self.startIndex = editable.currentPage * original.count
     }
     
@@ -131,5 +135,6 @@ public extension MetaPage {
         case startIndex = "from"
         case lastPage = "last_page"
         case count = "per_page"
+        case total = "total"
     }
 }

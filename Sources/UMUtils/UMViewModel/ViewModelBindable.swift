@@ -31,15 +31,12 @@ public protocol ViewModelBindable: class {
     func bindViewModel(viewModel: ViewModel)
 }
 
-private let viewModelAssociated = ObjectAssociation<ViewModel>(policy: .OBJC_ASSOCIATION_RETAIN)
+private let viewModelObject = ObjectAssociation<ViewModel>(policy: .OBJC_ASSOCIATION_RETAIN)
 
 extension ViewModelBindable {
 
     public var viewModel: ViewModel! {
-        
-        get {
-            return viewModelAssociated[self] as? ViewModel
-        }
+        get { viewModelObject[self] as? ViewModel }
         
         set(newViewModel) {
             guard self.viewModel == nil else {
@@ -50,13 +47,15 @@ extension ViewModelBindable {
                 fatalError("[ViewModel] don't init view model with nil values")
             }
 
-            viewModelAssociated[self] = viewModel
+            viewModelObject[self] = newViewModel
             registerBinding(viewModel: viewModel)
         }
     }
-    
-    private func registerBinding(viewModel: ViewModel) {
+}
+
+private extension ViewModelBindable {
+    func registerBinding(viewModel: ViewModel) {
+        viewModel.binders()
         bindViewModel(viewModel: viewModel)
     }
-    
 }
