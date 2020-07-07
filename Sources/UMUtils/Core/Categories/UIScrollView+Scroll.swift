@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#if os(iOS) || os(tvOS)
 import UIKit
 
 extension UIScrollView {
@@ -28,3 +29,4 @@ extension UIScrollView {
         setContentOffset(desiredOffset, animated: true)
     }
 }
+#endif

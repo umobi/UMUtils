@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#if os(iOS) || os(tvOS)
 import UIKit
 
 extension UIView {
@@ -39,5 +40,5 @@ extension UIView {
             layer.cornerRadius = value
         }
     }
-    
 }
+#endif

@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#if os(iOS) || os(tvOS)
 import UIKit
 
 public extension UIViewController {
@@ -35,3 +36,4 @@ public extension UIViewController {
         return (storyboard.instantiateViewController(withIdentifier: identifier) as? T)!
     }
 }
+#endif

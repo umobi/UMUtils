@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#if os(iOS) || os(tvOS)
 import UIKit
 
 extension UIView {
@@ -78,6 +79,9 @@ extension UIView {
             layer.shadowPath = value
         }
     }
+}
+
+extension UIView {
 
     public func addBorder(side: ViewSide,
                           thickness: CGFloat,
@@ -132,3 +136,4 @@ extension UIView {
         return border
     }
 }
+#endif

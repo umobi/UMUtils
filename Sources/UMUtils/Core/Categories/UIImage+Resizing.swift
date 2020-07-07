@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#if os(iOS) || os(tvOS)
 import UIKit
 import ImageIO
 
@@ -76,3 +77,4 @@ public extension UIImage {
         return newImage
     }
 }
+#endif

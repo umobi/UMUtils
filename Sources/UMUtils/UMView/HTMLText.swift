@@ -20,26 +20,33 @@
 // THE SOFTWARE.
 //
 
-import Moya
-import RxSwift
-import RxCocoa
+import SwiftUI
+import WebKit
 
-public extension ObservableType where Element == Moya.Response {
-    
-    func map<T: Decodable>(_ mappableType: T.Type) -> Observable<APIResult<T>> {
-        return flatMap { response -> Observable<APIResult<T>> in
-            return .just(response.mapApi(mappableType))
-        }.do(onError: { error in
-            APIErrorManager.shared?.didReviceError(error)
-            print("[Decoding \(T.self)] error \(error)")
-        })
+public struct HTMLText: UIViewRepresentable {
+    public typealias UIViewType = WKWebView
+
+    private let htmlString: String
+
+    init(htmlString: String,
+         fontFamily: String = "-apple-system",
+         fontSize: CGFloat = UIFont.systemFontSize) {
+
+        let styleTagString = Self.styleForFont(family: fontFamily, size: fontSize)
+        let htmlString = styleTagString + htmlString
+
+        self.htmlString = htmlString
     }
-    
-    // MARK: Map to Driver
-    
-    func mapDriver<T: Decodable>(_ mappableType: T.Type) -> Driver<APIResult<T>> {
-        return map(mappableType).asDriver(onErrorRecover: { (error) -> Driver<APIResult<T>> in
-            return .just(.error(error))
-        })
+
+    public func makeUIView(context: Context) -> WKWebView {
+        return WKWebView()
+    }
+
+    public func updateUIView(_ uiView: WKWebView, context: Context) {
+        uiView.loadHTMLString(self.htmlString, baseURL: nil)
+    }
+
+    private static func styleForFont(family: String, size: CGFloat) -> String {
+        return "<style>body{font-family: '\(family)';font-size: \(size)px;}</style>"
     }
 }

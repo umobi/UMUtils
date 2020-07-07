@@ -20,10 +20,12 @@
 // THE SOFTWARE.
 //
 
+#if os(iOS) || os(tvOS)
 import UIKit
 
 public extension UIColor {
     var image: UIImage? {
-        return UIImage(color: self)
+        UIImage(color: self)
     }
 }
+#endif

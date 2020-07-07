@@ -20,7 +20,8 @@
 // THE SOFTWARE.
 //
 
-import UIKit
+import Foundation
+import CoreText
 
 public extension UnicodeScalar {
 

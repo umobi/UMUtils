@@ -6,32 +6,18 @@ import PackageDescription
 let package = Package(
     name: "UMUtils",
     platforms: [
-        .iOS(.v10)
+        .iOS(.v13), .tvOS(.v13), .macOS(.v10_15), .watchOS(.v6)
     ],
     products: [
-        // Products define the executables and libraries produced by a package, and make them visible to other packages.
         .library(name: "UMUtils", targets: ["UMUtils"])
     ],
     dependencies: [
-        // Dependencies declare other packages that this package depends on.
-        .package(url: "https://github.com/Moya/Moya", .upToNextMajor(from: "14.0.0")),
-        .package(url: "https://github.com/ReactiveX/RxSwift", .upToNextMajor(from: "5.0.0")),
-        .package(url: "https://github.com/CosmicMind/Material", .upToNextMajor(from: "3.0.0")),
-        .package(url: "https://github.com/cocoatoucher/AIFlatSwitch", .upToNextMajor(from: "1.0.7")),
-        .package(url: "https://github.com/umobi/ConstraintBuilder", .upToNextMajor(from: "1.0.6")),
-        .package(url: "https://github.com/umobi/UIContainer", .upToNextMajor(from: "2.0.0")),
-        .package(url: "https://github.com/umobi/UICreator", from: "1.0.0-alpha")
+        .package(name: "Request", url: "https://github.com/carson-katri/swift-request", .upToNextMajor(from: "1.2.2"))
     ],
     targets: [
-        // Targets are the basic building blocks of a package. A target can define a module or a test suite.
-        // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "UMUtils",
-            dependencies: [
-                "Material", "ConstraintBuilder", "UIContainer", "RxSwift",
-                "AIFlatSwitch", "Moya", "UICreator",
-                .product(name: "RxCocoa", package: "RxSwift")
-            ]
+            dependencies: ["Request"]
         ),
         
         .testTarget(

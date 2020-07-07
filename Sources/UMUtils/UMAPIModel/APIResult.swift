@@ -28,9 +28,7 @@ public protocol APIResultWrapper {
 
 public enum APIResult<T: Decodable>: APIResultWrapper {
     case success(T)
-    case stepSuccess(T)
     case error(Error)
-    case undefined
     case empty
 }
 

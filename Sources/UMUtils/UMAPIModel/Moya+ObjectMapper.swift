@@ -21,20 +21,103 @@
 //
 
 import Foundation
-import Moya
+import Request
+import Combine
 
-public extension Response {
-
-    func mapApi<T: Decodable>(_ type: T.Type) -> APIResult<T> {
-        if self.statusCode == 204 {
-            return APIResult.empty
+extension RequestError: Error {
+    var localizedDescription: String {
+        guard let data = self.error else {
+            return "Error code: \(self.statusCode)"
         }
 
-        do {
-            return .success(try JSONDecoder().decode(T.self, from: self.data))
-        } catch {
-            APIErrorManager.shared?.didReviceError(error)
-            return APIResult.error(error)
+        return String(data: data, encoding: .utf8) ?? "Error code: \(self.statusCode)"
+    }
+}
+
+public extension Request {
+    struct Publisher<Output>: Combine.Publisher where Output: Decodable {
+        public typealias Failure = Error
+
+        let request: AnyRequest<Data>
+        init(_ request: AnyRequest<Data>) {
+            self.request = request
+        }
+
+        public func receive<S>(subscriber: S) where S : Subscriber, Self.Failure == S.Failure, Self.Output == S.Input {
+            subscriber.receive(subscription: Request.Subscription(subscriber: subscriber, request: self.request))
         }
     }
+}
+
+extension Request {
+    final class Subscription<SubscriberType: Subscriber, Object: Decodable>: Combine.Subscription where SubscriberType.Input == Object, SubscriberType.Failure == Error {
+        private var subscriber: SubscriberType?
+        private let request: AnyRequest<Data>
+
+        init(subscriber: SubscriberType, request: AnyRequest<Data>) {
+            self.subscriber = subscriber
+            self.request = request
+
+            self.request.onData { [weak self] in
+                self?.onData($0)
+            }.onError { [weak self] in
+                self?.onError($0)
+            }.call()
+        }
+
+        func request(_ demand: Subscribers.Demand) {
+            // We do nothing here as we only want to send events when they occur.
+            // See, for more info: https://developer.apple.com/documentation/combine/subscribers/demand
+        }
+
+        func cancel() {
+            subscriber = nil
+        }
+
+        func onData(_ data: Data) {
+            do {
+                let object = try JSONDecoder().decode(Object.self, from: data)
+                _ = self.subscriber?.receive(object)
+            } catch let error {
+                self.subscriber?.receive(completion: .failure(error))
+            }
+        }
+
+        func onError(_ error: RequestError) {
+            subscriber?.receive(completion: .failure(error))
+        }
+    }
+}
+
+public extension Request {
+    func publisher<Object>(_ decodable: Object.Type) -> Request.Publisher<Object> where Object: Decodable {
+        .init(self)
+    }
+
+    func apiPublisher<Object>(_ decodable: Object.Type) -> Publishers.Catch<Publishers.Map<Request.Publisher<Object>, APIResult<Object>>, Just<APIResult<Object>>> where Object: Decodable {
+        self.publisher(Object.self)
+            .map { .success($0) }
+            .catch {
+                if let requestError = $0 as? RequestError, requestError.statusCode == 204 {
+                    return Just(.empty)
+                }
+
+                return Just(.error($0))
+        }
+    }
+}
+
+func a() {
+    Request {
+        Url("https://jsonplaceholder.typicode.com/posts")
+        Method(.post)
+        Header.ContentType(.json)
+        Body([
+            "title": "foo",
+            "body": "bar",
+            "usedId": 1
+        ])
+    }
+    .apiPublisher(APIObject<Int>.self)
+
 }

@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#if os(iOS) || os(tvOS)
 import UIKit
 
 fileprivate var selector: Selector = #selector(getter: UIWindow.visibleViewController)
@@ -47,3 +48,4 @@ public extension UIWindow {
         }
     }
 }
+#endif

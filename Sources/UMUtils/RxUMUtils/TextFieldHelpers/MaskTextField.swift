@@ -21,34 +21,34 @@
 //
 
 import Foundation
-import UIKit
-import RxCocoa
-import RxSwift
+import SwiftUI
 
-private var kMaskTextField: UInt = 0
-extension UITextField {
-    var maskText: MaskTextField? {
-        get { objc_getAssociatedObject(self, &kMaskTextField) as? MaskTextField }
-        set { objc_setAssociatedObject(self, &kMaskTextField, newValue, .OBJC_ASSOCIATION_RETAIN)}
-    }
-}
-
-public struct MaskTextField {
+@propertyWrapper
+public struct MaskedText: DynamicProperty {
+    @State private var storage: String
     private let mask: MaskType
 
-    public init(mask: MaskType) {
+    public init(wrappedValue value: String,_ mask: MaskType) {
         self.mask = mask
+        self._storage = .init(wrappedValue: value.mask(mask))
     }
-    
-    public func onTextField(_ textField: UITextField!) {
-        textField.maskText = self
 
-        textField.rx.text.startWith(textField.text)
-            .subscribe(onNext: { [weak textField] text in
-                let masked = text?.mask(self.mask)
-                if masked != text {
-                    textField?.text = masked
-                }
-            }).disposed(by: textField.disposeBag)
+    public var wrappedValue: String {
+        get { self.$storage.wrappedValue }
+        nonmutating
+        set { self.process(newValue.mask(self.mask)) }
+    }
+
+    public var projectedValue: Binding<String> {
+        .init(get: {
+            self.wrappedValue
+        }, set: {
+            self.wrappedValue = $0
+        })
+    }
+
+    private func process(_ value: String) {
+        // do some something here or in background queue
+        self.storage = value
     }
 }

@@ -21,16 +21,7 @@
 //
 
 import Foundation
-import Moya
-
-public extension Swift.Error {
-    var isSessionExpired: Bool {
-        if let moyaError = self as? MoyaError, let response = moyaError.response, response.statusCode == 401 {
-            return true
-        }
-        return false
-    }
-}
+import Request
 
 public protocol APIErrorDelegate {
     func didReviceError(_ error: Swift.Error)
@@ -55,26 +46,17 @@ public class APIErrorManager {
 
 public extension APIError {
     static func mount(from error: Swift.Error) -> APIError? {
-        do {
-            switch error {
-            case let moyaError as MoyaError:
-                if let response = moyaError.response {
-                    return try JSONDecoder().decode(APIError.self, from: response.data)
-                }
-
-                if case .underlying(let error, _) = moyaError {
-                    return .init(error: error)
-                }
-
-                return .init(error: moyaError)
-
-            case let decodingError as DecodingError:
-                return .init(error: decodingError)
-
-            default:
-                return nil
+        switch error {
+        case let requestError as RequestError:
+            if let data = requestError.error {
+                return try? JSONDecoder().decode(APIError.self, from: data)
             }
-        } catch {
+
+            return .init(error: requestError)
+        case let decodingError as DecodingError:
+            return .init(error: decodingError)
+
+        default:
             return nil
         }
     }
