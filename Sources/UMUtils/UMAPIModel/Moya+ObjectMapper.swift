@@ -107,6 +107,29 @@ public extension Request {
     }
 }
 
+public extension Publisher where Output: APIResultWrapper, Failure == Never {
+    func retryOnConnected(maxOfRetries: Int) -> Publishers.FlatMap<Self, Publishers.Filter<Publishers.RemoveDuplicates<Publishers.HandleEvents<Published<Bool>.Publisher>>>> {
+        var retriesCount = 0
+
+        return Networking.shared.isConnected
+            .removeDuplicates(by: {
+                Swift.print("Result \($0) \($1)")
+                return !(!$0 && $1)
+            })
+            .filter { _ in
+                if maxOfRetries == retriesCount {
+                    return false
+                }
+
+                retriesCount += 1
+                return true
+            }
+            .flatMap { _ in
+                self
+            }
+    }
+}
+
 func a() {
     Request {
         Url("https://jsonplaceholder.typicode.com/posts")
@@ -119,5 +142,6 @@ func a() {
         ])
     }
     .apiPublisher(APIObject<Int>.self)
+
 
 }
