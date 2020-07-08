@@ -56,6 +56,9 @@ public extension APIError {
         case let decodingError as DecodingError:
             return .init(error: decodingError)
 
+        case let urlError as URLError:
+            return .init(error: urlError)
+            
         default:
             return nil
         }

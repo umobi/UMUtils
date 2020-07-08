@@ -24,16 +24,6 @@ import Foundation
 import Request
 import Combine
 
-extension RequestError: Error {
-    var localizedDescription: String {
-        guard let data = self.error else {
-            return "Error code: \(self.statusCode)"
-        }
-
-        return String(data: data, encoding: .utf8) ?? "Error code: \(self.statusCode)"
-    }
-}
-
 public extension Request {
     struct Publisher<Output>: Combine.Publisher where Output: Decodable {
         public typealias Failure = Error
@@ -83,7 +73,7 @@ extension Request {
             }
         }
 
-        func onError(_ error: RequestError) {
+        func onError(_ error: Error) {
             subscriber?.receive(completion: .failure(error))
         }
     }
@@ -107,26 +97,79 @@ public extension Request {
     }
 }
 
+public extension Error {
+    var isBecauseOfBadConnection: Bool {
+        guard let urlError = self as? URLError else {
+            return false
+        }
+
+        switch urlError.code {
+        case .backgroundSessionWasDisconnected, .notConnectedToInternet, .networkConnectionLost, .cannotConnectToHost:
+            return true
+        default:
+            return false
+        }
+    }
+}
+
 public extension Publisher where Output: APIResultWrapper, Failure == Never {
-    func retryOnConnected(maxOfRetries: Int) -> Publishers.FlatMap<Self, Publishers.Filter<Publishers.RemoveDuplicates<Publishers.HandleEvents<Published<Bool>.Publisher>>>> {
-        var retriesCount = 0
+    private var retryOnConnect: AnyPublisher<Self.Output, Self.Failure> {
+        self.flatMap { result -> AnyPublisher<Self.Output, Self.Failure> in
+            guard result.error?.isBecauseOfBadConnection ?? false else {
+                return Just(result)
+                    .eraseToAnyPublisher()
+            }
 
-        return Networking.shared.isConnected
-            .removeDuplicates(by: {
-                Swift.print("Result \($0) \($1)")
-                return !(!$0 && $1)
-            })
-            .filter { _ in
-                if maxOfRetries == retriesCount {
-                    return false
+            return Networking.shared.isConnected
+                .flatMap { isConnected -> AnyPublisher<Self.Output, Self.Failure> in
+                    guard isConnected else {
+                        return Empty()
+                            .eraseToAnyPublisher()
+                    }
+
+                    return self.retryOnConnect
+                        .eraseToAnyPublisher()
                 }
+                .first()
+                .eraseToAnyPublisher()
 
-                retriesCount += 1
-                return true
+        }
+        .eraseToAnyPublisher()
+    }
+
+    func retryOnConnect(timeout: TimeInterval) -> AnyPublisher<Self.Output, Self.Failure> {
+        self.retryOnConnect
+            .timeout(.seconds(timeout), scheduler: DispatchQueue.main)
+            .eraseToAnyPublisher()
+    }
+
+    private func singleRetryOnConnect(onError: @escaping (Error) -> Bool) -> AnyPublisher<Self.Output, Self.Failure> {
+        self.flatMap { result -> AnyPublisher<Self.Output, Self.Failure> in
+            guard let error = result.error, onError(error) else {
+                return Just(result)
+                    .eraseToAnyPublisher()
             }
-            .flatMap { _ in
-                self
-            }
+
+            return Networking.shared.isConnected
+                .flatMap { isConnected -> AnyPublisher<Self.Output, Self.Failure> in
+                    guard isConnected else {
+                        return Empty()
+                            .eraseToAnyPublisher()
+                    }
+
+                    return self.singleRetryOnConnect(onError: onError)
+                        .eraseToAnyPublisher()
+                }
+                .first()
+                .eraseToAnyPublisher()
+        }
+        .eraseToAnyPublisher()
+    }
+
+    func retryOnConnect(timeout: TimeInterval, onError: @escaping (Error) -> Bool) -> AnyPublisher<Self.Output, Self.Failure> {
+        self.singleRetryOnConnect(onError: onError)
+            .timeout(.seconds(timeout), scheduler: DispatchQueue.main)
+            .eraseToAnyPublisher()
     }
 }
 
@@ -142,6 +185,4 @@ func a() {
         ])
     }
     .apiPublisher(APIObject<Int>.self)
-
-
 }
