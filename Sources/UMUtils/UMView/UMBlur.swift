@@ -21,46 +21,25 @@
 //
 
 import Foundation
-import Request
 
-public protocol APIErrorDelegate {
-    func didReviceError(_ error: Swift.Error)
-}
+#if os(tvOS) || os(iOS)
+import SwiftUI
+import UIKit
 
-public class APIErrorManager {
-    private(set) static var shared: APIErrorManager?
-    let delegate: APIErrorDelegate
+public struct UMBlur: UIViewRepresentable {
+    private let style: UIBlurEffect.Style
 
-    init(_ delegate: APIErrorDelegate) {
-        self.delegate = delegate
+    init(style: UIBlurEffect.Style = .systemMaterial) {
+        self.style = style
     }
 
-    public static func tracked(by delegate: APIErrorDelegate) {
-        self.shared = .init(delegate)
+    public func makeUIView(context: Context) -> UIVisualEffectView {
+        return UIVisualEffectView(effect: UIBlurEffect(style: self.style))
     }
 
-    func didReviceError(_ error: Swift.Error) {
-        self.delegate.didReviceError(error)
+    public func updateUIView(_ uiView: UIVisualEffectView, context: Context) {
+        uiView.effect = UIBlurEffect(style: self.style)
     }
 }
 
-public extension APIError {
-    static func mount(from error: Swift.Error) -> APIError? {
-        switch error {
-        case let requestError as RequestError:
-            if let data = requestError.error {
-                return try? JSONDecoder().decode(APIError.self, from: data)
-            }
-
-            return .init(error: requestError)
-        case let decodingError as DecodingError:
-            return .init(error: decodingError)
-
-        case let urlError as URLError:
-            return .init(error: urlError)
-            
-        default:
-            return nil
-        }
-    }
-}
+#endif

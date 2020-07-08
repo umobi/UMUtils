@@ -23,11 +23,11 @@
 import Foundation
 import Combine
 
-//public protocol MetaPageElement {
-//    associatedtype Index
-//    var indexPath: IndexPath { get }
-//    static func map(_ elements: [Index], startingAt indexPath: IndexPath) -> [Self]
-//}
+public protocol MetaPageElement {
+    associatedtype Index
+    var indexPath: IndexPath { get }
+    static func map(_ elements: [Index], startingAt indexPath: IndexPath) -> [Self]
+}
 //
 //public protocol MetaPageModel: class {
 //    associatedtype Model: MetaPageElement

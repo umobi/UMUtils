@@ -83,7 +83,9 @@ public extension Request {
     func publisher<Object>(_ decodable: Object.Type) -> Request.Publisher<Object> where Object: Decodable {
         .init(self)
     }
+}
 
+public extension Request {
     func apiPublisher<Object>(_ decodable: Object.Type) -> Publishers.Catch<Publishers.Map<Request.Publisher<Object>, APIResult<Object>>, Just<APIResult<Object>>> where Object: Decodable {
         self.publisher(Object.self)
             .map { .success($0) }
@@ -95,94 +97,4 @@ public extension Request {
                 return Just(.error($0))
         }
     }
-}
-
-public extension Error {
-    var isBecauseOfBadConnection: Bool {
-        guard let urlError = self as? URLError else {
-            return false
-        }
-
-        switch urlError.code {
-        case .backgroundSessionWasDisconnected, .notConnectedToInternet, .networkConnectionLost, .cannotConnectToHost:
-            return true
-        default:
-            return false
-        }
-    }
-}
-
-public extension Publisher where Output: APIResultWrapper, Failure == Never {
-    private var retryOnConnect: AnyPublisher<Self.Output, Self.Failure> {
-        self.flatMap { result -> AnyPublisher<Self.Output, Self.Failure> in
-            guard result.error?.isBecauseOfBadConnection ?? false else {
-                return Just(result)
-                    .eraseToAnyPublisher()
-            }
-
-            return Networking.shared.isConnected
-                .flatMap { isConnected -> AnyPublisher<Self.Output, Self.Failure> in
-                    guard isConnected else {
-                        return Empty()
-                            .eraseToAnyPublisher()
-                    }
-
-                    return self.retryOnConnect
-                        .eraseToAnyPublisher()
-                }
-                .first()
-                .eraseToAnyPublisher()
-
-        }
-        .eraseToAnyPublisher()
-    }
-
-    func retryOnConnect(timeout: TimeInterval) -> AnyPublisher<Self.Output, Self.Failure> {
-        self.retryOnConnect
-            .timeout(.seconds(timeout), scheduler: DispatchQueue.main)
-            .eraseToAnyPublisher()
-    }
-
-    private func singleRetryOnConnect(onError: @escaping (Error) -> Bool) -> AnyPublisher<Self.Output, Self.Failure> {
-        self.flatMap { result -> AnyPublisher<Self.Output, Self.Failure> in
-            guard let error = result.error, onError(error) else {
-                return Just(result)
-                    .eraseToAnyPublisher()
-            }
-
-            return Networking.shared.isConnected
-                .flatMap { isConnected -> AnyPublisher<Self.Output, Self.Failure> in
-                    guard isConnected else {
-                        return Empty()
-                            .eraseToAnyPublisher()
-                    }
-
-                    return self.singleRetryOnConnect(onError: onError)
-                        .eraseToAnyPublisher()
-                }
-                .first()
-                .eraseToAnyPublisher()
-        }
-        .eraseToAnyPublisher()
-    }
-
-    func retryOnConnect(timeout: TimeInterval, onError: @escaping (Error) -> Bool) -> AnyPublisher<Self.Output, Self.Failure> {
-        self.singleRetryOnConnect(onError: onError)
-            .timeout(.seconds(timeout), scheduler: DispatchQueue.main)
-            .eraseToAnyPublisher()
-    }
-}
-
-func a() {
-    Request {
-        Url("https://jsonplaceholder.typicode.com/posts")
-        Method(.post)
-        Header.ContentType(.json)
-        Body([
-            "title": "foo",
-            "body": "bar",
-            "usedId": 1
-        ])
-    }
-    .apiPublisher(APIObject<Int>.self)
 }
