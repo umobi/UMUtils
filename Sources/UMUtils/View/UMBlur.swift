@@ -21,9 +21,9 @@
 //
 
 import Foundation
+import SwiftUI
 
 #if os(tvOS) || os(iOS)
-import SwiftUI
 import UIKit
 
 public struct UMBlur: UIViewRepresentable {
@@ -41,5 +41,4 @@ public struct UMBlur: UIViewRepresentable {
         uiView.effect = UIBlurEffect(style: self.style)
     }
 }
-
 #endif

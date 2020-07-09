@@ -22,6 +22,9 @@
 
 import SwiftUI
 
+#if os(iOS) || os(tvOS)
+import UIKit
+
 public struct ActivityView: View {
     private let style: UIActivityIndicatorView.Style
     private let color: UIColor
@@ -146,4 +149,5 @@ struct ActivityView_Previews: PreviewProvider {
         ActivityView(style: .large)
     }
 }
+#endif
 #endif

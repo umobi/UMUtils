@@ -21,7 +21,9 @@
 //
 
 import SwiftUI
+#if os(iOS) || os(tvOS)
 import WebKit
+import UIKit
 
 public struct HTMLText: UIViewRepresentable {
     public typealias UIViewType = WKWebView
@@ -50,3 +52,4 @@ public struct HTMLText: UIViewRepresentable {
         return "<style>body{font-family: '\(family)';font-size: \(size)px;}</style>"
     }
 }
+#endif
