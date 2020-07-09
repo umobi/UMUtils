@@ -205,7 +205,7 @@ public extension UMAlert {
 }
 
 public extension UMAlert {
-    func cancelButton<Title>(title: Title, onTap: @escaping () -> Void) -> Self where Title: StringProtocol {
+    func cancelButton<Title>(title: Title, tintColor: Color = .blue, onTap: @escaping () -> Void) -> Self where Title: StringProtocol {
         self.addButton {
             Button(action: onTap) {
                 Text(title)
@@ -215,7 +215,7 @@ public extension UMAlert {
                     .multilineTextAlignment(.center)
                     .padding(.all, 15)
                     .frame(maxWidth: .infinity)
-                    .background(Color.blue)
+                    .background(tintColor)
                     .cornerRadius(5)
             }
         }

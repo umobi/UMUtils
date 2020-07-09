@@ -6,11 +6,18 @@ import Request
 final class UMUtilsTests: XCTestCase {
     var cancellations: [AnyCancellable] = []
 
+    let isLoading: CurrentValueSubject<Bool, Never> = .init(false)
+
     func testExample() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
         let expectation = XCTestExpectation(description: "Download apple.com home page")
+
+        isLoading.sink(receiveValue: {
+            Swift.print("isLoading: \($0)")
+        })
+        .store(in: &self.cancellations)
 
         print("Result", "Started")
 
@@ -19,7 +26,7 @@ final class UMUtilsTests: XCTestCase {
             Method(.get)
             Header.ContentType(.json)
         }
-        .apiPublisher(APIObject<Config>.self)
+        .apiPublisher(APIObject<Config>.self, isLoading: self.isLoading)
         .retryOnConnect(timeout: 30)
         .sink {
             print("Result", $0)

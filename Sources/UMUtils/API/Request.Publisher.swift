@@ -25,16 +25,29 @@ import Request
 import Combine
 
 public extension Request {
+
+    enum PublisherLodingType {
+        case boolean(CurrentValueSubject<Bool, Never>)
+    }
+
     struct Publisher<Output>: Combine.Publisher where Output: Decodable {
         public typealias Failure = Error
 
         let request: AnyRequest<Data>
-        init(_ request: AnyRequest<Data>) {
+        let loadingType: PublisherLodingType
+        init(_ request: AnyRequest<Data>,_ type: PublisherLodingType) {
             self.request = request
+            self.loadingType = type
         }
 
         public func receive<S>(subscriber: S) where S : Subscriber, Self.Failure == S.Failure, Self.Output == S.Input {
-            subscriber.receive(subscription: Request.Subscription(subscriber: subscriber, request: self.request))
+            subscriber.receive(
+                subscription: Request.Subscription(
+                    subscriber:  subscriber,
+                    request: self.request,
+                    loadingType: self.loadingType
+                )
+            )
         }
     }
 }
@@ -44,15 +57,21 @@ extension Request {
         private var subscriber: SubscriberType?
         private let request: AnyRequest<Data>
 
-        init(subscriber: SubscriberType, request: AnyRequest<Data>) {
+        init(subscriber: SubscriberType, request: AnyRequest<Data>, loadingType: PublisherLodingType) {
             self.subscriber = subscriber
             self.request = request
 
-            self.request.onData { [weak self] in
-                self?.onData($0)
-            }.onError { [weak self] in
-                self?.onError($0)
-            }.call()
+            switch loadingType {
+            case .boolean(let subject):
+                subject.send(true)
+                self.request.onData { [weak self] in
+                    subject.send(false)
+                    self?.onData($0)
+                }.onError { [weak self] in
+                    subject.send(false)
+                    self?.onError($0)
+                }.call()
+            }
         }
 
         func request(_ demand: Subscribers.Demand) {
@@ -80,21 +99,24 @@ extension Request {
 }
 
 public extension Request {
-    func publisher<Object>(_ decodable: Object.Type) -> Request.Publisher<Object> where Object: Decodable {
-        .init(self)
+    func publisher<Object>(_ decodable: Object.Type, isLoading: CurrentValueSubject<Bool, Never> = .init(false)) -> Request.Publisher<Object> where Object: Decodable {
+        .init(self, .boolean(isLoading))
     }
 }
 
 public extension Request {
-    func apiPublisher<Object>(_ decodable: Object.Type) -> Publishers.Catch<Publishers.Map<Request.Publisher<Object>, APIResult<Object>>, Just<APIResult<Object>>> where Object: Decodable {
-        self.publisher(Object.self)
+    func apiPublisher<Object>(_ decodable: Object.Type, isLoading: CurrentValueSubject<Bool, Never> = .init(false)) -> AnyPublisher<APIResult<Object>, Never> where Object: Decodable {
+        self.publisher(Object.self, isLoading: isLoading)
             .map { .success($0) }
-            .catch {
-                if let requestError = $0 as? RequestError, requestError.statusCode == 204 {
+            .catch { result -> AnyPublisher<APIResult<Object>, Never> in
+                if let requestError = result as? RequestError, requestError.statusCode == 204 {
                     return Just(.empty)
+                        .eraseToAnyPublisher()
                 }
 
-                return Just(.error($0))
-        }
+                return Just(.error(result))
+                    .eraseToAnyPublisher()
+            }
+            .eraseToAnyPublisher()
     }
 }
