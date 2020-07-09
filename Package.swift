@@ -12,7 +12,7 @@ let package = Package(
         .library(name: "UMUtils", targets: ["UMUtils"])
     ],
     dependencies: [
-        .package(name: "Request", url: "https://github.com/carson-katri/swift-request", .upToNextMajor(from: "1.2.2"))
+        .package(name: "Request", url: "https://github.com/carson-katri/swift-request", .branch("master"))
     ],
     targets: [
         .target(

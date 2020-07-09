@@ -20,7 +20,7 @@ final class UMUtilsTests: XCTestCase {
             Header.ContentType(.json)
         }
         .apiPublisher(APIObject<Config>.self)
-        .retryOnConnected(maxOfRetries: 30)
+        .retryOnConnect(timeout: 30)
         .sink {
             print("Result", $0)
             if case .success = $0 {

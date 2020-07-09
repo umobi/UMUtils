@@ -15,7 +15,9 @@ public struct Networking {
     public var isConnected: Publishers.HandleEvents<Published<Bool>.Publisher> {
         self.box.startMonitoring()
 
-        return self.box.$isConnected.handleEvents(receiveCancel: {
+        return self.box.$isConnected.handleEvents(receiveCompletion: { _ in
+            self.box.stopMonitoring()
+        }, receiveCancel: {
             self.box.stopMonitoring()
         })
     }
