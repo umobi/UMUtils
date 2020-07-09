@@ -29,7 +29,7 @@ import UIKit
 public struct UMBlur: UIViewRepresentable {
     private let style: UIBlurEffect.Style
 
-    init(style: UIBlurEffect.Style = .systemMaterial) {
+    public init(style: UIBlurEffect.Style = .systemMaterial) {
         self.style = style
     }
 
