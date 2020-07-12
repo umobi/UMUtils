@@ -46,20 +46,20 @@ extension AlertView {
             if let fadeView = self.view.fadeView {
                 CBSubview(contentView).addSubview(fadeView)
 
-                Constraintable.activate(
+                Constraintable.activate {
                     fadeView.cbuild
                         .edges
-                )
+                }
             }
 
             if self.view.useBlur {
                 let blurView = BlurView(blur: self.view.blurEffectStyle)
                 CBSubview(contentView).addSubview(blurView)
 
-                Constraintable.activate(
+                Constraintable.activate {
                     blurView.cbuild
                         .edges
-                )
+                }
             }
 
             let centerView = ContentView(
@@ -69,20 +69,20 @@ extension AlertView {
 
             CBSubview(contentView).addSubview(centerView)
 
-            Constraintable.activate(
+            Constraintable.activate {
                 centerView.cbuild
                     .top
-                    .equalTo(contentView.cbuild.topMargin),
+                    .equalTo(contentView.cbuild.topMargin)
 
                 centerView.cbuild
                     .bottom
-                    .equalTo(contentView.cbuild.bottomMargin),
+                    .equalTo(contentView.cbuild.bottomMargin)
 
                 centerView.cbuild
                     .leading
                     .trailing
                     .equalTo(0)
-            )
+            }
 
             let tap = UITapGestureRecognizer(target: self, action: #selector(self.tapOnBackground))
             contentView.addGestureRecognizer(tap)
@@ -114,10 +114,10 @@ extension AlertView: ViewControllerType {
             let containerView = AlertView.Container.init(in: $0, loadHandler: { self })
             CBSubview($0.view).addSubview(containerView)
 
-            Constraintable.activate(
+            Constraintable.activate {
                 containerView.cbuild
                     .edges
-            )
+            }
         }
     }
     

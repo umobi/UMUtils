@@ -55,13 +55,13 @@ open class AlertView: UIView {
             return
         }
 
-        Constraintable.update(
+        Constraintable.update {
             view.cbuild
                 .height
                 .equalTo(superview)
                 .update()
                 .constant(height)
-        )
+        }
     }
     
     open func createImage(_ image: UIImage) -> UIImageView {
@@ -285,15 +285,15 @@ open class AlertView: UIView {
         CBSubview(self.stackView).addArrangedSubview(scrollView)
         CBSubview(self).addSubview(spacer)
 
-        Constraintable.activate(
+        Constraintable.activate {
             spacer.cbuild
-                .edges,
+                .edges
 
             content.cbuild
                 .height
                 .equalTo(scrollView)
                 .priority(.init(500))
-        )
+        }
         
         self.applyWidth()
         
@@ -325,11 +325,11 @@ open class AlertView: UIView {
     open var alertWidth: CGFloat = defaultWidth
     
     private final func applyWidth() {
-        Constraintable.activate(
+        Constraintable.activate {
             self.spacer.cbuild
                 .width
                 .equalTo(alertWidth)
-        )
+        }
     }
     
     open var actionButtonType: AlertButton.Action.Type {

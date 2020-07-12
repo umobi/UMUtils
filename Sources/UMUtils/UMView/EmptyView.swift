@@ -172,21 +172,21 @@ fileprivate extension EmptyView {
         CBSubview(self).addSubview(scroll)
         self.stackView = stackView
 
-        Constraintable.activate(
+        Constraintable.activate {
             scroll.cbuild
                 .top
                 .bottom
-                .greaterThanOrEqualTo(50),
+                .greaterThanOrEqualTo(50)
 
             scroll.cbuild
                 .centerY
-                .equalTo(self.cbuild.centerY),
+                .equalTo(self.cbuild.centerY)
 
             scroll.cbuild
                 .leading
                 .trailing
                 .equalTo(50)
-        )
+        }
     }
 }
 
@@ -210,22 +210,22 @@ fileprivate extension EmptyView {
 
         self.imageView = self.createImageView()
 
-        Constraintable.activate(
+        Constraintable.activate {
             self.imageContainer.cbuild
                 .height
                 .equalTo(100)
-        )
+        }
 
-        Constraintable.activate(
+        Constraintable.activate {
             self.imageView.cbuild
                 .width
                 .height
-                .equalTo(self.imageContainer.cbuild.height),
+                .equalTo(self.imageContainer.cbuild.height)
 
             self.imageView.cbuild
                 .center
                 .equalTo(self.imageContainer)
-        )
+        }
 
         self.imageView.layer.cornerRadius = 50
     }
@@ -290,35 +290,35 @@ fileprivate extension EmptyView {
         CBSubview(self.stackView).addArrangedSubview(containerView)
         self.actionContainer = containerView
 
-        Constraintable.activate(
+        Constraintable.activate {
             containerView.cbuild
                 .height
                 .equalTo(50)
                 .priority(.defaultLow)
-        )
+        }
 
         CBSubview(containerView).addSubview(actionButton)
 
 
-        Constraintable.activate(
+        Constraintable.activate {
             actionButton.cbuild
                 .width
-                .equalTo(210),
+                .equalTo(210)
 
             actionButton.cbuild
                 .leading
                 .trailing
-                .greaterThanOrEqualTo(0),
+                .greaterThanOrEqualTo(0)
 
             actionButton.cbuild
                 .centerX
-                .equalTo(containerView),
+                .equalTo(containerView)
 
             actionButton.cbuild
                 .top
                 .bottom
                 .equalTo(0)
-        )
+        }
     }
 }
 
@@ -374,10 +374,10 @@ private class Box: UIView {
         super.init(frame: .zero)
         CBSubview(self).addSubview(view)
 
-        Constraintable.activate(
+        Constraintable.activate {
             view.cbuild
                 .edges
-        )
+        }
     }
 
     required init?(coder: NSCoder) {
@@ -471,10 +471,10 @@ public class EmptyFactory<View: UIView & EmptyPayload> {
         if let customView = self.payload.customView?() {
             let box = Box(customView)
             UIView.CBSubview(emptyView).addSubview(box)
-            Constraintable.activate(
+            Constraintable.activate {
                 box.cbuild
                     .edges
-            )
+            }
         } else {
             if let title = self.payload.title?() {
                 emptyView.apply(title: title)
@@ -516,11 +516,11 @@ public class EmptyFactory<View: UIView & EmptyPayload> {
         let emptyView = View()
         let box = Box(ContentView(emptyView, contentMode: .center))
         UIView.CBSubview(contentView).addSubview(box)
-        Constraintable.activate(
+        Constraintable.activate {
             box.cbuild
                 .edges
                 .equalTo(view)
-        )
+        }
 
         isEmpty? { isEmpty in
             if isEmpty {

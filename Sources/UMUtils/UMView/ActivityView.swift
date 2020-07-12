@@ -81,10 +81,10 @@ open class ActivityView: View {
         let rounder = RounderView(contentView, radius: 5)
         CBSubview(self).addSubview(rounder)
 
-        Constraintable.activate(
+        Constraintable.activate {
             rounder.cbuild
                 .edges
-        )
+        }
 
         self.contentView = contentView
 
@@ -114,10 +114,10 @@ open class ActivityView: View {
 
         CBSubview(self.contentView).addSubview(blur)
 
-        Constraintable.activate(
+        Constraintable.activate {
             blur.cbuild
                 .edges
-        )
+        }
 
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -126,10 +126,10 @@ open class ActivityView: View {
 
         CBSubview(self.contentView).addSubview(scroll)
 
-        Constraintable.activate(
+        Constraintable.activate {
             scroll.cbuild
                 .edges
-        )
+        }
 
         self.stackView = stackView
     }
@@ -170,32 +170,32 @@ open class ActivityView: View {
         return [SpacerView({
             let content = ContentView(activity, contentMode: .center)
 
-            Constraintable.activate(
+            Constraintable.activate {
                 activity.cbuild
                     .leading
                     .trailing
-                    .priority(.defaultHigh),
+                    .priority(.defaultHigh)
 
                 activity.cbuild
                     .top
                     .priority(.defaultHigh)
-            )
+            }
 
             return content
         }(), margin: .init(spacing: 30)), {
             let spacer = SpacerView({
                 let content = ContentView(titleLabel, contentMode: .center)
 
-                Constraintable.activate(
+                Constraintable.activate {
                     titleLabel.cbuild
                         .leading
                         .trailing
-                        .priority(.defaultHigh),
+                        .priority(.defaultHigh)
 
                     titleLabel.cbuild
                         .width
                         .lessThanOrEqualTo(200)
-                )
+                }
 
                 return content
             }(), margin: .init(top: 0, bottom: 15, leading: 15, trailing: 15))
@@ -253,10 +253,10 @@ open class ActivityView: View {
         let container = Container(in: nil, loadHandler: { self })
         CBSubview(view).addSubview(container)
 
-        Constraintable.activate(
+        Constraintable.activate {
             container.cbuild
                 .edges
-        )
+        }
 
         self.start()
         self.container = container
@@ -288,10 +288,10 @@ extension ActivityView {
             let center = ContentView(view, contentMode: .center)
             CBSubview(contentView).addSubview(center)
 
-            Constraintable.activate(
+            Constraintable.activate {
                 center.cbuild
                     .edges
-            )
+            }
 
             center.layer.shadowOffset = .init(width: 1, height: 2)
             center.layer.shadowOpacity = 0.1
@@ -335,10 +335,10 @@ extension ActivityView: ViewControllerType {
             let container = Container(in: $0, loadHandler: { self })
             CBSubview($0.view).addSubview(container)
 
-            Constraintable.activate(
+            Constraintable.activate {
                 container.cbuild
                     .edges
-            )
+            }
         }
     }
 }
