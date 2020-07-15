@@ -6,7 +6,7 @@ import Request
 final class UMUtilsTests: XCTestCase {
     var cancellations: [AnyCancellable] = []
 
-    let isLoading: CurrentValueSubject<Bool, Never> = .init(false)
+    let isLoading: ActivityPublisher = .init()
 
     func testExample() {
         // This is an example of a functional test case.
@@ -27,7 +27,7 @@ final class UMUtilsTests: XCTestCase {
             Header.ContentType(.json)
         }
         .apiPublisher(APIObject<Config>.self, isLoading: self.isLoading)
-        .retryOnConnect(timeout: 30)
+        .retryOnConnect(timeout: .forever)
         .sink {
             print("Result", $0)
             if case .success = $0 {

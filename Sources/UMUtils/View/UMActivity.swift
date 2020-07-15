@@ -20,17 +20,16 @@
 // THE SOFTWARE.
 //
 
-import Foundation
+import SwiftUI
 
 #if os(iOS) || os(tvOS)
-import SwiftUI
 import UIKit
 
-struct UMActivity: UIViewRepresentable {
+public struct UMActivity: UIViewRepresentable {
     private let style: UIActivityIndicatorView.Style
     private let color: UIColor
 
-    init(style: UIActivityIndicatorView.Style) {
+    public init(style: UIActivityIndicatorView.Style) {
         self.style = style
         self.color = .black
     }
@@ -54,26 +53,84 @@ struct UMActivity: UIViewRepresentable {
         return .init(self, editable: editable)
     }
 
-    func color(_ color: UIColor) -> Self {
+    public func color(_ color: UIColor) -> Self {
         self.edit {
             $0.color = color
         }
     }
 
-    func makeUIView(context: Context) -> View {
+    public func makeUIView(context: Context) -> View {
         return View(style: self.style)
     }
 
-    func updateUIView(_ uiView: View, context: Context) {
+    public func updateUIView(_ uiView: View, context: Context) {
         uiView.style = self.style
         uiView.color = self.color
     }
 }
 
-extension UMActivity {
+public extension UMActivity {
     class View: UIActivityIndicatorView {
-        override func didMoveToWindow() {
+        public override func didMoveToWindow() {
             super.didMoveToWindow()
+
+            if self.window != nil && !self.isAnimating {
+                self.startAnimating()
+                return
+            }
+
+            self.stopAnimating()
+        }
+    }
+}
+#endif
+
+#if os(macOS)
+public struct UMActivity: NSViewRepresentable {
+
+    private let size: NSControl.ControlSize
+    private let tint: NSControlTint
+
+    public init(size: NSControl.ControlSize, tint: NSControlTint) {
+        self.size = size
+        self.tint = tint
+    }
+
+    public func makeNSView(context: Context) -> View {
+        return View()
+    }
+
+    public func updateNSView(_ progressIndicator: View, context: Context) {
+        progressIndicator.style = .spinning
+        progressIndicator.controlSize = self.size
+        progressIndicator.controlTint = self.tint
+    }
+}
+
+public extension UMActivity {
+    class View: NSProgressIndicator {
+        private(set) var isAnimating: Bool = false
+
+        public override func startAnimation(_ sender: Any?) {
+            super.startAnimation(sender)
+            self.isAnimating = true
+        }
+
+        public override func stopAnimation(_ sender: Any?) {
+            super.stopAnimation(sender)
+            self.isAnimating = false
+        }
+
+        public func startAnimating() {
+            self.startAnimation(self)
+        }
+
+        public func stopAnimating() {
+            self.stopAnimation(self)
+        }
+
+        public override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
 
             if self.window != nil && !self.isAnimating {
                 self.startAnimating()

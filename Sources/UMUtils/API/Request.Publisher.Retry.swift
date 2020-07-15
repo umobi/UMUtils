@@ -25,7 +25,7 @@ import Request
 import Combine
 
 private extension Publisher where Output: APIResultWrapper, Failure == Never {
-    var retryOnConnect: AnyPublisher<Self.Output, Self.Failure> {
+    var rawRetryOnConnect: AnyPublisher<Self.Output, Self.Failure> {
         self.flatMap { result -> AnyPublisher<Self.Output, Self.Failure> in
             guard result.error?.isBecauseOfBadConnection ?? false else {
                 return Just(result)
@@ -39,7 +39,7 @@ private extension Publisher where Output: APIResultWrapper, Failure == Never {
                             .eraseToAnyPublisher()
                     }
 
-                    return self.retryOnConnect
+                    return self.rawRetryOnConnect
                         .eraseToAnyPublisher()
                 }
                 .first()
@@ -73,18 +73,31 @@ private extension Publisher where Output: APIResultWrapper, Failure == Never {
     }
 }
 
+public enum APIRelativeTimeoutTime {
+    case seconds(Int)
+    case forever
+
+    func timeout<Publisher, Scheduler>(_ publisher: Publisher, scheduler: Scheduler) -> AnyPublisher<Publisher.Output, Publisher.Failure> where Publisher: Combine.Publisher, Scheduler: Combine.Scheduler {
+        switch self {
+        case .forever:
+            return publisher
+                .eraseToAnyPublisher()
+        case .seconds(let seconds):
+            return publisher
+                .timeout(.seconds(seconds), scheduler: scheduler)
+                .eraseToAnyPublisher()
+        }
+    }
+}
+
 public extension Publisher where Output: APIResultWrapper, Failure == Never {
 
-    func retryOnConnect(timeout: TimeInterval) -> AnyPublisher<Self.Output, Self.Failure> {
-        self.retryOnConnect
-            .timeout(.seconds(timeout), scheduler: DispatchQueue.main)
-            .eraseToAnyPublisher()
+    func retryOnConnect(timeout: APIRelativeTimeoutTime) -> AnyPublisher<Self.Output, Self.Failure> {
+        timeout.timeout(self.rawRetryOnConnect, scheduler: DispatchQueue.main)
     }
 
-    func retryOnConnect(timeout: TimeInterval, onError: @escaping (Error) -> Bool) -> AnyPublisher<Self.Output, Self.Failure> {
-        self.singleRetryOnConnect(onError: onError)
-            .timeout(.seconds(timeout), scheduler: DispatchQueue.main)
-            .eraseToAnyPublisher()
+    func retryOnConnect(timeout: APIRelativeTimeoutTime, onError: @escaping (Error) -> Bool) -> AnyPublisher<Self.Output, Self.Failure> {
+        timeout.timeout(self.singleRetryOnConnect(onError: onError), scheduler: DispatchQueue.main)
     }
 }
 

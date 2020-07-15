@@ -42,3 +42,31 @@ public struct UMBlur: UIViewRepresentable {
     }
 }
 #endif
+
+#if os(macOS)
+import AppKit
+
+public struct UMBlur: NSViewRepresentable {
+    private let material: NSVisualEffectView.Material
+    private let blendingMode: NSVisualEffectView.BlendingMode
+
+    public init(material: NSVisualEffectView.Material, blendingMode: NSVisualEffectView.BlendingMode) {
+        self.material = material
+        self.blendingMode = blendingMode
+    }
+
+    public func makeNSView(context: Context) -> NSVisualEffectView {
+        let visualEffectView = NSVisualEffectView()
+        visualEffectView.material = self.material
+        visualEffectView.blendingMode = self.blendingMode
+        visualEffectView.state = NSVisualEffectView.State.active
+        return visualEffectView
+    }
+
+    public func updateNSView(_ visualEffectView: NSVisualEffectView, context: Context) {
+        visualEffectView.material = self.material
+        visualEffectView.blendingMode = self.blendingMode
+    }
+}
+
+#endif

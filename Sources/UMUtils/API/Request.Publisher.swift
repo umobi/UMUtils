@@ -27,7 +27,7 @@ import Combine
 public extension Request {
 
     enum PublisherLodingType {
-        case boolean(CurrentValueSubject<Bool, Never>)
+        case boolean(ActivityPublisher)
     }
 
     struct Publisher<Output>: Combine.Publisher where Output: Decodable {
@@ -63,12 +63,12 @@ extension Request {
 
             switch loadingType {
             case .boolean(let subject):
-                subject.send(true)
+                subject.increment()
                 self.request.onData { [weak self] in
-                    subject.send(false)
+                    subject.decrement()
                     self?.onData($0)
                 }.onError { [weak self] in
-                    subject.send(false)
+                    subject.decrement()
                     self?.onError($0)
                 }.call()
             }
@@ -99,13 +99,13 @@ extension Request {
 }
 
 public extension Request {
-    func publisher<Object>(_ decodable: Object.Type, isLoading: CurrentValueSubject<Bool, Never> = .init(false)) -> Request.Publisher<Object> where Object: Decodable {
+    func publisher<Object>(_ decodable: Object.Type, isLoading: ActivityPublisher = .init()) -> Request.Publisher<Object> where Object: Decodable {
         .init(self, .boolean(isLoading))
     }
 }
 
 public extension Request {
-    func apiPublisher<Object>(_ decodable: Object.Type, isLoading: CurrentValueSubject<Bool, Never> = .init(false)) -> AnyPublisher<APIResult<Object>, Never> where Object: Decodable {
+    func apiPublisher<Object>(_ decodable: Object.Type, isLoading: ActivityPublisher = .init()) -> AnyPublisher<APIResult<Object>, Never> where Object: Decodable {
         self.publisher(Object.self, isLoading: isLoading)
             .map { .success($0) }
             .catch { result -> AnyPublisher<APIResult<Object>, Never> in

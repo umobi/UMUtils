@@ -24,14 +24,26 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS)
 import UIKit
+#elseif os(macOS)
+import AppKit
+#endif
 
+#if os(iOS) || os(tvOS) || os(macOS)
 public struct ActivityView: View {
+
+    #if os(iOS) || os(tvOS)
     private let style: UIActivityIndicatorView.Style
     private let color: UIColor
+    #elseif os(macOS)
+    private let size: NSControl.ControlSize
+    private let tint: NSControlTint
+    #endif
+
     private let title: String?
     private let titleColor: Color?
     private let titleFont: Font?
 
+    #if os(iOS) || os(tvOS)
     public init(style: UIActivityIndicatorView.Style) {
         self.style = style
         self.color = .black
@@ -39,10 +51,25 @@ public struct ActivityView: View {
         self.titleColor = nil
         self.titleFont = nil
     }
+    #elseif os(macOS)
+    public init(tint: NSControlTint) {
+        self.size = .regular
+        self.tint = tint
+        self.title = nil
+        self.titleColor = nil
+        self.titleFont = nil
+    }
+    #endif
 
     private init(_ original: ActivityView, editable: Editable) {
+        #if os(iOS) || os(tvOS)
         self.style = original.style
         self.color = editable.color
+        #elseif os(macOS)
+        self.size = editable.size
+        self.tint = original.tint
+        #endif
+
         self.title = editable.title
         self.titleColor = editable.titleColor
         self.titleFont = editable.titleFont
@@ -58,9 +85,14 @@ public struct ActivityView: View {
 
             ZStack {
                 VStack(spacing: 7.5) {
+                    #if os(iOS) || os(tvOS)
                     UMActivity(style: self.style)
                         .color(self.color)
                         .padding(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/, 15)
+                    #elseif os(macOS)
+                    UMActivity(size: self.size, tint: self.tint)
+                        .padding(.all, 15)
+                    #endif
 
                     if let title = self.title {
                         ScrollView {
@@ -83,7 +115,13 @@ public struct ActivityView: View {
                 .layoutPriority(2)
             }
             .padding(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/, 15)
-            .background(UMBlur())
+            .background({ () -> UMBlur in
+                #if os(iOS) || os(tvOS)
+                return UMBlur()
+                #elseif os(macOS)
+                return UMBlur(material: .contentBackground, blendingMode: .withinWindow)
+                #endif
+            }())
             .cornerRadius(7.5)
             .shadow(
                 color: Color.black.opacity(0.15),
@@ -96,13 +134,22 @@ public struct ActivityView: View {
 
 private extension ActivityView {
     class Editable {
+        #if os(iOS) || os(tvOS)
         var color: UIColor
+        #elseif os(macOS)
+        var size: NSControl.ControlSize
+        #endif
         var title: String?
         var titleColor: Color?
         var titleFont: Font?
 
         init(_ original: ActivityView) {
+            #if os(iOS) || os(tvOS)
             self.color = original.color
+            #elseif os(macOS)
+            self.size = original.size
+            #endif
+
             self.title = original.title
             self.titleColor = original.titleColor
             self.titleFont = original.titleFont
@@ -118,11 +165,19 @@ private extension ActivityView {
 
 public extension ActivityView {
 
+    #if os(iOS) || os(tvOS)
     func color(_ color: UIColor) -> Self {
         self.edit {
             $0.color = color
         }
     }
+    #elseif os(macOS)
+    func size(_ size: NSControl.ControlSize) -> Self {
+        self.edit {
+            $0.size = size
+        }
+    }
+    #endif
 
     func title(_ title: String) -> Self {
         self.edit {
@@ -142,12 +197,4 @@ public extension ActivityView {
         }
     }
 }
-
-#if DEBUG
-struct ActivityView_Previews: PreviewProvider {
-    static var previews: some View {
-        ActivityView(style: .large)
-    }
-}
-#endif
 #endif

@@ -21,8 +21,13 @@
 //
 
 import SwiftUI
-
 #if os(iOS) || os(tvOS)
+import UIKit
+#elseif os(macOS)
+import AppKit
+#endif
+
+#if os(iOS) || os(tvOS) || os(macOS)
 public struct UMAlert: View {
 
     private let titles: [AnyView]
@@ -54,10 +59,13 @@ public struct UMAlert: View {
                 .edgesIgnoringSafeArea(.all)
 
             ZStack {
+                #if os(iOS) || os(tvOS)
                 UMBlur(style: .extraLight)
+                #elseif os(macOS)
+                UMBlur(material: .contentBackground, blendingMode: .withinWindow)
+                #endif
 
                 VStack(spacing: 15) {
-
                     self.content {
                         VStack(spacing: 7.5) {
                             if !self.titles.isEmpty {
@@ -231,7 +239,13 @@ public extension UMAlert {
                     .multilineTextAlignment(.center)
                     .padding(.all, 15)
                     .frame(maxWidth: .infinity)
-                    .background(UMBlur(style: .extraLight))
+                    .background({ () -> UMBlur in
+                        #if os(iOS) || os(tvOS)
+                        return UMBlur(style: .extraLight)
+                        #elseif os(macOS)
+                        return UMBlur(material: .selection, blendingMode: .withinWindow)
+                        #endif
+                    }())
                     .cornerRadius(5)
             }
         }
@@ -246,7 +260,13 @@ public extension UMAlert {
                     .multilineTextAlignment(.center)
                     .padding(.all, 15)
                     .frame(maxWidth: .infinity)
-                    .background(UMBlur(style: .extraLight))
+                    .background({ () -> UMBlur in
+                        #if os(iOS) || os(tvOS)
+                        return UMBlur(style: .extraLight)
+                        #elseif os(macOS)
+                        return UMBlur(material: .selection, blendingMode: .withinWindow)
+                        #endif
+                    }())
                     .cornerRadius(5)
             }
         }
