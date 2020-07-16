@@ -6,7 +6,7 @@ final class UMUtilsTests: XCTestCase {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
-        XCTAssertEqual(UMUtils().text, "Hello, World!")
+//        XCTAssertEqual(UMUtils().text, "Hello, World!")
     }
 
     static var allTests = [

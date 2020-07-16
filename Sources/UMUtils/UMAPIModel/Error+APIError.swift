@@ -23,6 +23,21 @@
 import Foundation
 import Moya
 
+public extension Error {
+    var isBecauseOfBadConnection: Bool {
+        guard let urlError = self as? URLError else {
+            return false
+        }
+
+        switch urlError.code {
+        case .backgroundSessionWasDisconnected, .notConnectedToInternet, .networkConnectionLost, .cannotConnectToHost:
+            return true
+        default:
+            return false
+        }
+    }
+}
+
 public extension Swift.Error {
     var isSessionExpired: Bool {
         if let moyaError = self as? MoyaError, let response = moyaError.response, response.statusCode == 401 {
