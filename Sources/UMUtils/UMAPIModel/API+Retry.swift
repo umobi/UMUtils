@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by brennobemoura on 16/07/20.
 //
@@ -9,60 +9,67 @@ import Foundation
 import RxCocoa
 import RxSwift
 
+private struct Collapsed<Wrapper>: Error where Wrapper: APIResultWrapper {
+    let error: Error
+    let wrapper: Wrapper
+}
+
+@available(iOS 12, *)
+private extension ObservableType {
+    func apiFlapMapError(onError: ((Error) -> Bool)? = nil) -> Observable<Element> where Element: APIResultWrapper {
+        self.flatMap { result -> Observable<Element> in
+            if let error = result.error {
+                if let onError = onError {
+                    if onError(error) {
+                        return .error(Collapsed(error: error, wrapper: result))
+                    }
+                } else if error.isBecauseOfBadConnection {
+                    return .error(Collapsed(error: error, wrapper: result))
+                }
+            }
+
+            return .just(result)
+        }
+    }
+
+    func apiRetryWhen() -> Observable<Element> where Element: APIResultWrapper {
+        self.retryWhen {
+            $0.flatMap { _ in
+                Networking.shared
+                    .isConnected
+                    .filter { $0 }
+            }
+        }
+    }
+
+    func apiRestoreError() -> Observable<Element> where Element: APIResultWrapper {
+        self.catchError { error -> Observable<Element> in
+            guard let collapsed = error as? Collapsed<Element> else {
+                return .never()
+            }
+
+            return .just(collapsed.wrapper)
+        }
+    }
+}
+
 @available(iOS 12, *)
 extension SharedSequence where Element: APIResultWrapper {
     var rawRetryOnConnect: SharedSequence<DriverSharingStrategy, Element> {
-            self.flatMapLatest { result -> SharedSequence<DriverSharingStrategy, Element> in
-                guard result.error?.isBecauseOfBadConnection ?? false else {
-                    return .just(result)
-                }
+        self.asObservable()
+            .apiFlapMapError()
+            .apiRetryWhen()
+            .apiRestoreError()
+            .asSharedSequence(onErrorDriveWith: .never())
+    }
 
-                return Networking.shared.isConnected
-                    .flatMapLatest { isConnected -> SharedSequence<DriverSharingStrategy, Element> in
-                        guard isConnected else {
-                            return .never()
-                        }
-
-                        return self.rawRetryOnConnect
-                    }
-                    .first()
-                    .asSharedSequence(sharingStrategy: SharingStrategy.self, onErrorDriveWith: .never())
-                    .flatMapLatest {
-                        guard let result = $0 else {
-                            return .never()
-                        }
-
-                        return .just(result)
-                    }
-
-            }
-        }
-
-        func singleRetryOnConnect(onError: @escaping (Error) -> Bool) -> SharedSequence<DriverSharingStrategy, Element> {
-            self.flatMap { result -> SharedSequence<DriverSharingStrategy, Element> in
-                guard let error = result.error, onError(error) else {
-                    return .just(result)
-                }
-
-                return Networking.shared.isConnected
-                    .flatMap { isConnected -> SharedSequence<DriverSharingStrategy, Element> in
-                        guard isConnected else {
-                            return .never()
-                        }
-
-                        return self.singleRetryOnConnect(onError: onError)
-                    }
-                    .first()
-                    .asSharedSequence(sharingStrategy: SharingStrategy.self, onErrorDriveWith: .never())
-                    .flatMapLatest {
-                        guard let result = $0 else {
-                            return .never()
-                        }
-
-                        return .just(result)
-                    }
-            }
-        }
+    func singleRetryOnConnect(onError: @escaping (Error) -> Bool) -> SharedSequence<DriverSharingStrategy, Element> {
+        self.asObservable()
+            .apiFlapMapError(onError: onError)
+            .apiRetryWhen()
+            .apiRestoreError()
+            .asSharedSequence(onErrorDriveWith: .never())
+    }
 }
 
 public enum APIRelativeTimeoutTime {
