@@ -24,6 +24,98 @@ import Foundation
 import Request
 import Combine
 
+class SingleSubject<Publisher>: Subject where Publisher: Combine.Publisher {
+    typealias Failure = Publisher.Failure
+    typealias Output = Publisher.Output
+
+    enum Payload {
+        case output(Output)
+        case failure(Failure)
+        case finished
+        case empty
+    }
+
+    var payload: Payload = .empty
+    var cancelations: [AnyCancellable] = []
+
+    var onValidPayload: ((Payload) -> Void)? = nil
+
+    func send(_ value: Output) {
+        guard case .empty = self.payload else {
+            return
+        }
+
+        self.payload = .output(value)
+        self.cancelations = []
+
+        self.onValidPayload?(self.payload)
+    }
+
+    func send(completion: Subscribers.Completion<Failure>) {
+        guard case .empty = self.payload else {
+            return
+        }
+
+        switch completion {
+        case .failure(let failure):
+            self.payload = .failure(failure)
+        case .finished:
+            self.payload = .finished
+        }
+
+        self.cancelations = []
+        self.onValidPayload?(self.payload)
+    }
+
+    func send(subscription: Subscription) {
+        Swift.print("send(subscription:)", subscription)
+    }
+
+    static func commit<S>(payload: Payload, subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
+        switch payload {
+        case .output(let output):
+            _ = subscriber.receive(output)
+        case .failure(let failure):
+            subscriber.receive(completion: .failure(failure))
+        case .finished:
+            subscriber.receive(completion: .finished)
+        case .empty:
+            return
+        }
+    }
+
+    func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
+        guard case .empty = self.payload else {
+            Self.commit(payload: self.payload, subscriber: subscriber)
+            return
+        }
+
+        self.onValidPayload = {
+            Self.commit(payload: $0, subscriber: subscriber)
+        }
+    }
+
+    init(_ publisher: Publisher) {
+        let cancellable = publisher.sink {
+            self.send(completion: $0)
+        } receiveValue: {
+            self.send($0)
+        }
+
+        if case .empty = self.payload {
+            cancellable.store(in: &self.cancelations)
+            return
+        }
+    }
+}
+
+public extension Publisher {
+    func single() -> AnyPublisher<Output, Failure> {
+        SingleSubject(self)
+            .eraseToAnyPublisher()
+    }
+}
+
 private extension Publisher where Output: APIResultWrapper, Failure == Never {
     var rawRetryOnConnect: AnyPublisher<Self.Output, Self.Failure> {
         self.flatMap { result -> AnyPublisher<Self.Output, Self.Failure> in
@@ -33,18 +125,11 @@ private extension Publisher where Output: APIResultWrapper, Failure == Never {
             }
 
             return Networking.shared.isConnected
-                .flatMap { isConnected -> AnyPublisher<Self.Output, Self.Failure> in
-                    guard isConnected else {
-                        return Empty()
-                            .eraseToAnyPublisher()
-                    }
-
-                    return self.rawRetryOnConnect
-                        .eraseToAnyPublisher()
-                }
-                .first()
+                .filter { $0 }
+                .single()
+                .flatMap { _ in self.rawRetryOnConnect }
+                .prepend(result)
                 .eraseToAnyPublisher()
-
         }
         .eraseToAnyPublisher()
     }
@@ -57,16 +142,10 @@ private extension Publisher where Output: APIResultWrapper, Failure == Never {
             }
 
             return Networking.shared.isConnected
-                .flatMap { isConnected -> AnyPublisher<Self.Output, Self.Failure> in
-                    guard isConnected else {
-                        return Empty()
-                            .eraseToAnyPublisher()
-                    }
-
-                    return self.singleRetryOnConnect(onError: onError)
-                        .eraseToAnyPublisher()
-                }
-                .first()
+                .filter { $0 }
+                .single()
+                .flatMap { _ in self.singleRetryOnConnect(onError: onError) }
+                .prepend(result)
                 .eraseToAnyPublisher()
         }
         .eraseToAnyPublisher()
@@ -93,11 +172,17 @@ public enum APIRelativeTimeoutTime {
 public extension Publisher where Output: APIResultWrapper, Failure == Never {
 
     func retryOnConnect(timeout: APIRelativeTimeoutTime) -> AnyPublisher<Self.Output, Self.Failure> {
-        timeout.timeout(self.rawRetryOnConnect, scheduler: DispatchQueue.main)
+        timeout.timeout(
+            self.rawRetryOnConnect,
+            scheduler: DispatchQueue.main
+        )
     }
 
     func retryOnConnect(timeout: APIRelativeTimeoutTime, onError: @escaping (Error) -> Bool) -> AnyPublisher<Self.Output, Self.Failure> {
-        timeout.timeout(self.singleRetryOnConnect(onError: onError), scheduler: DispatchQueue.main)
+        timeout.timeout(
+            self.singleRetryOnConnect(onError: onError),
+            scheduler: DispatchQueue.main
+        )
     }
 }
 

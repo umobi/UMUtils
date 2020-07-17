@@ -22,7 +22,13 @@
 
 import Foundation
 
-open class APIObject<Object: Decodable>: Decodable {
+public protocol APIRawObject: Decodable {
+    associatedtype Object: Decodable
+
+    var data: Object { get }
+}
+
+public struct APIObject<Object: Decodable>: APIRawObject {
     public let data: Object
 
     public init(data: Object) {

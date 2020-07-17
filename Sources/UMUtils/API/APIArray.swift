@@ -22,7 +22,13 @@
 
 import Foundation
 
-open class APIArray<Element: Decodable>: Decodable {
+public protocol APICollection: APIRawObject {
+    associatedtype Element: Decodable
+
+    var data: [Element] { get }
+}
+
+public struct APIArray<Element: Decodable>: APICollection {
     public let data: [Element]
     public let meta: MetaPage?
 
@@ -31,7 +37,7 @@ open class APIArray<Element: Decodable>: Decodable {
         self.meta = metaPage
     }
 
-    required public init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         self.data = try container.decode(.data)

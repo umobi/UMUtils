@@ -8,6 +8,10 @@
 import Foundation
 import Combine
 
+public func positiveOrZero<Number>(_ x: Number) -> Number where Number: Numeric & Comparable {
+    x <= 0 ? 0 : x
+}
+
 public struct ActivityPublisher: Publisher {
     public typealias Output = Bool
     public typealias Failure = Never
@@ -25,7 +29,7 @@ public struct ActivityPublisher: Publisher {
     }
 
     func decrement() {
-        self.subject.value = abs(self.subject.value - 1)
+        self.subject.value = positiveOrZero(self.subject.value - 1)
     }
 }
 

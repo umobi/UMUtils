@@ -25,8 +25,27 @@ import SwiftUI
 #if os(iOS) || os(tvOS)
 import UIKit
 
-class PrivateDefaultTranstionView: UIView {
+final class PrivateDefaultTranstionView: UIView {
     var isPresenting: Bool = false
+
+    private var commitWhenInWindow: ((PrivateDefaultTranstionView, UIViewController) -> Void)? = nil
+
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+
+        guard self.window != nil, let viewController = self.viewController else {
+            return
+        }
+
+        self.commitWhenInWindow?(self, viewController)
+        self.commitWhenInWindow = nil
+    }
+
+    func whenInWindow(_ handler: @escaping (PrivateDefaultTranstionView, UIViewController) -> Void) {
+        self.commitWhenInWindow = {
+            handler($0, $1)
+        }
+    }
 }
 
 struct DefaultTransitionViewWrapper: UIViewRepresentable {
@@ -42,6 +61,32 @@ struct DefaultTransitionViewWrapper: UIViewRepresentable {
         PrivateDefaultTranstionView()
     }
 
+    private func present(_ uiView: PrivateDefaultTranstionView,_ viewController: UIViewController) {
+        viewController.present(self.presentMaker.viewController(onDismiss: { [weak uiView] in
+            if self.isPresented {
+                self.isPresented = false
+                uiView?.isPresenting = false
+            }
+        }), animated: self.presentMaker.animated, completion: self.presentMaker.onCompletion)
+    }
+
+    private func requestPresentation(_ uiView: PrivateDefaultTranstionView) {
+        if uiView.isPresenting {
+            return
+        }
+
+        uiView.isPresenting = true
+
+        guard let viewController = uiView.viewController else {
+            uiView.whenInWindow {
+                self.present($0, $1)
+            }
+            return
+        }
+
+        self.present(uiView, viewController)
+    }
+
     func updateUIView(_ uiView: PrivateDefaultTranstionView, context: Context) {
         if !self.isPresented {
             if uiView.isPresenting {
@@ -54,19 +99,7 @@ struct DefaultTransitionViewWrapper: UIViewRepresentable {
             return
         }
 
-        guard let viewController = uiView.viewController else {
-            fatalError()
-        }
-
-        uiView.isPresenting = true
-
-        viewController.present(self.presentMaker.viewController(onDismiss: { [weak uiView] in
-            if self.isPresented {
-                self.isPresented = false
-                uiView?.isPresenting = false
-            }
-        }), animated: self.presentMaker.animated, completion: self.presentMaker.onCompletion)
-
+        self.requestPresentation(uiView)
     }
 }
 

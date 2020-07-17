@@ -64,6 +64,7 @@ extension Request {
             switch loadingType {
             case .boolean(let subject):
                 subject.increment()
+
                 self.request.onData { [weak self] in
                     subject.decrement()
                     self?.onData($0)
