@@ -25,13 +25,27 @@ import Moya
 
 public extension Error {
     var isBecauseOfBadConnection: Bool {
-        guard let urlError = self as? URLError else {
-            return false
-        }
+        switch self {
+        case let moyaError as MoyaError:
+            guard case .underlying(let error, _) = moyaError else {
+                return false
+            }
 
-        switch urlError.code {
-        case .backgroundSessionWasDisconnected, .notConnectedToInternet, .networkConnectionLost, .cannotConnectToHost:
-            return true
+            return error.isBecauseOfBadConnection
+        case let urlError as URLError:
+            switch urlError.code {
+            case .backgroundSessionWasDisconnected, .notConnectedToInternet, .networkConnectionLost, .cannotConnectToHost:
+                return true
+            default:
+                return false
+            }
+        case let nsError as NSError:
+            switch CFNetworkErrors(rawValue: Int32((nsError as NSError).code)) {
+            case .cfurlErrorBackgroundSessionWasDisconnected, .cfurlErrorBackgroundSessionInUseByAnotherProcess, .cfurlErrorNotConnectedToInternet, .cfurlErrorNetworkConnectionLost, .cfurlErrorCannotConnectToHost, .cfErrorHTTPProxyConnectionFailure:
+                return true
+            default:
+                return false
+            }
         default:
             return false
         }
