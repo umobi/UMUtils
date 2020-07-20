@@ -15,9 +15,9 @@ private struct Collapsed<Wrapper>: Error where Wrapper: APIResultWrapper {
 }
 
 @available(iOS 12, *)
-private extension ObservableType where E: APIResultWrapper {
-    func apiFlapMapError(onError: ((Error) -> Bool)? = nil) -> Observable<E> {
-        self.flatMap { result -> Observable<E> in
+private extension ObservableType where Element: APIResultWrapper {
+    func apiFlapMapError(onError: ((Error) -> Bool)? = nil) -> Observable<Element> {
+        self.flatMap { result -> Observable<Element> in
             if let error = result.error {
                 if let onError = onError {
                     if onError(error) {
@@ -32,19 +32,19 @@ private extension ObservableType where E: APIResultWrapper {
         }
     }
 
-    func apiRetryWhen() -> Observable<E> {
+    func apiRetryWhen() -> Observable<Element> {
         self.retryWhen {
             $0.flatMapLatest { _ in
-                NetworkingFramework.shared
+                Networking.shared
                     .isConnected
                     .filter { $0 }
             }
         }
     }
 
-    func apiRestoreError() -> Observable<E> {
-        self.catchError { error -> Observable<E> in
-            guard let collapsed = error as? Collapsed<E> else {
+    func apiRestoreError() -> Observable<Element> {
+        self.catchError { error -> Observable<Element> in
+            guard let collapsed = error as? Collapsed<Element> else {
                 return .never()
             }
 
