@@ -20,7 +20,7 @@ let package = Package(
         .package(url: "https://github.com/cocoatoucher/AIFlatSwitch", .upToNextMajor(from: "1.0.7")),
         .package(url: "https://github.com/umobi/ConstraintBuilder", .upToNextMajor(from: "2.0.0")),
         .package(url: "https://github.com/umobi/UIContainer", .upToNextMajor(from: "2.1.0")),
-        .package(url: "https://github.com/umobi/UICreator", from: "1.0.0")
+        .package(url: "https://github.com/umobi/UICreator", .upToNextMajor(from: "1.0.0"))
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
