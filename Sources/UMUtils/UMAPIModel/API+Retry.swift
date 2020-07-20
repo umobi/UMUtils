@@ -38,8 +38,6 @@ private extension ObservableType where E: APIResultWrapper {
                 NetworkingFramework.shared
                     .isConnected
                     .filter { $0 }
-                    .distinctUntilChanged()
-                    .debounce(15, scheduler: MainScheduler.asyncInstance)
             }
         }
     }
