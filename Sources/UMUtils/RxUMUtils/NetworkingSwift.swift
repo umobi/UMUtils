@@ -10,6 +10,10 @@ import Network
 import RxCocoa
 import RxSwift
 
+public func positive<Number>(_ x: Number) -> Number where Number: Comparable & Numeric {
+    x <= 0 ? 0 : x - 1
+}
+
 @available(iOS 12, *)
 public struct Networking {
     private let box: Box
@@ -17,9 +21,7 @@ public struct Networking {
     public var isConnected: Observable<Bool> {
         self.box.startMonitoring()
 
-        return self.box.isConnected.do(onCompleted: {
-            self.box.stopMonitoring()
-        }, onDispose: {
+        return self.box.isConnected.asObservable().do(onCompleted: {
             self.box.stopMonitoring()
         })
     }
@@ -67,7 +69,7 @@ extension Networking {
         }
 
         func stopMonitoring() {
-            self.listenerCount = abs(self.listenerCount - 1)
+            self.listenerCount = positive(self.listenerCount - 1)
 
             if self.listenerCount == 0 {
                 self.monitor.cancel()
@@ -76,7 +78,9 @@ extension Networking {
         }
 
         func pathChanged(_ path: NWPath) {
-            self.isConnected.accept(path.status == .satisfied)
+            DispatchQueue.main.async {
+                self.isConnected.accept(path.status == .satisfied)
+            }
         }
 
         deinit {

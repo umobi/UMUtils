@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'UMUtils'
-  s.version          = '1.4.1'
+  s.version          = '1.4.2'
   s.summary          = "Utility Class Library"
   s.homepage         = 'https://github.com/umobi/UMUtils'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }

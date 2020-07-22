@@ -22,6 +22,7 @@
 
 import Foundation
 import Moya
+import Alamofire
 
 public extension Error {
     var isBecauseOfBadConnection: Bool {
@@ -32,6 +33,9 @@ public extension Error {
             }
 
             return error.isBecauseOfBadConnection
+        case let afError as AFError:
+            return afError.underlyingError?.isBecauseOfBadConnection ?? false
+            
         case let urlError as URLError:
             switch urlError.code {
             case .backgroundSessionWasDisconnected, .notConnectedToInternet, .networkConnectionLost, .cannotConnectToHost:
