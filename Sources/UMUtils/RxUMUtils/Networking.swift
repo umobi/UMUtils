@@ -64,7 +64,7 @@ extension Networking {
         }
 
         func stopMonitoring() {
-            self.listenerCount = abs(self.listenerCount - 1)
+            self.listenerCount = positiveOrZero(self.listenerCount - 1)
 
             if self.listenerCount == 0 {
                 self.monitor.cancel()

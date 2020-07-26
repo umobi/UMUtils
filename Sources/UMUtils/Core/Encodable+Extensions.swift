@@ -94,3 +94,15 @@ public func >- <T, K: CodingKey, Transform: EncodableTransform>(left: T?, right:
 
     try? right.0.container.encode(value, forKey: right.0.actualKey)
 }
+
+public func >- <T, K: CodingKey, Transform: EncodableTransform>(left: [T], right: (KeyedEncodingContainer<K>.Wrapper<K>, Transform)) where Transform.Input == T {
+    try? right.0.container.encode(left.compactMap { right.1.encode($0) }, forKey: right.0.actualKey)
+}
+
+public func >- <T, K: CodingKey, Transform: EncodableTransform>(left: [T]?, right: (KeyedEncodingContainer<K>.Wrapper<K>, Transform)) where Transform.Input == T {
+    guard let left = left else {
+        return
+    }
+
+    try? right.0.container.encode(left.compactMap { right.1.encode($0) }, forKey: right.0.actualKey)
+}
