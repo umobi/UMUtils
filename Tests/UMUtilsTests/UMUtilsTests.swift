@@ -22,7 +22,7 @@ final class UMUtilsTests: XCTestCase {
         print("Result", "Started")
 
         Request {
-            Url("https://apihom.mercadoonbrasil.com.br/api/v1/settings")
+            Url("https://apihom.mercadoonbrasil.com.br/api/v2/settings")
             Method(.get)
             Header.ContentType(.json)
         }
