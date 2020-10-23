@@ -20,26 +20,18 @@
 // THE SOFTWARE.
 //
 
-import Moya
-import RxSwift
+import Foundation
 import RxCocoa
+import RxSwift
 
-public extension ObservableType where Element == Moya.Response {
-    
-    private func um_map<T: Decodable>(_ mappableType: T.Type) -> Observable<APIResult<T>> {
-        flatMap { response -> Observable<APIResult<T>> in
-            return .just(response.mapApi(mappableType))
-        }.do(onError: { error in
-            APIErrorManager.shared?.didReviceError(error)
-            print("[Decoding \(T.self)] error \(error)")
-        })
-    }
-    
-    // MARK: Map to Driver
-    
-    func apiMap<T: Decodable>(_ mappableType: T.Type) -> Observable<APIResult<T>> {
-        um_map(mappableType).catchError {
-            .just(.error($0))
-        }
-    }
+public func Just<Element>(_ element: Element) -> Observable<Element> {
+    .just(element)
+}
+
+public func Empty<Element>(outputType: Element.Type) -> Observable<Element> {
+    .empty()
+}
+
+public func Empty<Element>() -> Observable<Element> {
+    .empty()
 }

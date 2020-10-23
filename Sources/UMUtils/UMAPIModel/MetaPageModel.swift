@@ -21,8 +21,9 @@
 //
 
 import Foundation
-import RxCocoa
+import UICreator
 import RxSwift
+import RxCocoa
 
 public protocol MetaPageElement {
     associatedtype Index
@@ -30,79 +31,90 @@ public protocol MetaPageElement {
     static func map(_ elements: [Index], startingAt indexPath: IndexPath) -> [Self]
 }
 
-public protocol MetaPageModel: class {
-    associatedtype Model: MetaPageElement
-    var itemsRelay: BehaviorRelay<[Model]> { get }
-    
-    var didReachEndOfRows: PublishRelay<Void> { get }
-    var pageRelay: BehaviorRelay<MetaPage> { get }
-    
-    var reloadDriver: Driver<Void> { get }
-    var refreshPageRelay: PublishRelay<MetaPage>? { get }
+@propertyWrapper
+public struct Page<Element> where Element: MetaPageElement {
+    @Value private var items: [Element]
+    @Value private var page: MetaPage
+
+    private let needsToLoadNextPage: PublishRelay<Void>
+    private let refreshPageRelay: PublishRelay<MetaPage>
+
+    public init(wrappedValue value: [Element]) {
+        self.needsToLoadNextPage = .init()
+        self.refreshPageRelay = .init()
+        self._items = .init(wrappedValue: value)
+        self._page = .init(wrappedValue: .empty)
+    }
+
+    public var wrappedValue: [Element] {
+        get { self.items }
+        set { self.items = newValue }
+    }
+
+    public var projectedValue: Relay<[Element]> {
+        self.$items
+    }
+
+    public func loadNextPage() {
+        self.needsToLoadNextPage.accept(())
+    }
 }
 
-public extension MetaPageModel {
-    var refreshPageRelay: PublishRelay<MetaPage>? {
-        return nil
-    }
-    
-    var reloadDriver: Driver<Void> {
-        return .never()
-    }
-    
-    var refreshDriver: Driver<MetaPage> {
-        return Driver.merge(
-            self.reloadDriver.startWith(()).map { .empty },
-            self.continueLoadingPageDriver,
-            self.refreshPageRelay?.asDriver(onErrorDriveWith: .never()) ?? .never()
-        )
-    }
-    
-    private var continueLoadingPageDriver: Driver<MetaPage> {
-        return self.didReachEndOfRows
-            .asDriver(onErrorJustReturn: ())
-            .withLatestFrom(self.pageRelay.asDriver())
-            .filter { $0.status == .next }
-            .do(onNext: { [weak self] _ in
-                self?.pageRelay.accept(self!.pageRelay.value.lock)
-            })
-    }
-    
+public extension Page {
     // MARK: Paged
-    func appendRows(_ rows: [Model.Index], newPage: MetaPage, oldPage: MetaPage? = nil, map: ((Model) -> Model)? = nil) {
+    func appendRows(_ rows: [Element.Index], newPage: MetaPage, oldPage: MetaPage? = nil, map: ((Element) -> Element)? = nil) {
         let startIndex = newPage.startIndex - 1
-        let appendRows = Model.map(rows, startingAt: .init(row: startIndex, section: 0)).map {
+        let appendRows = Element.map(rows, startingAt: .init(row: startIndex, section: 0)).map {
             map?($0) ?? $0
         }
-        
+
         if case .reload? = oldPage?.status {
             let upperBound = startIndex+newPage.count
-            self.itemsRelay.accept(
-                Array(self.itemsRelay.value[0..<startIndex]) +
+            self.items = Array(self.items[0..<startIndex]) +
                 appendRows +
                 {
-                    if self.itemsRelay.value.count > upperBound {
-                        return Array(self.itemsRelay.value[upperBound ..< self.itemsRelay.value.count])
+                    if self.items.count > upperBound {
+                        return Array(self.items[upperBound ..< self.items.count])
                     }
-                    
+
                     return []
                 }()
-            )
-            return
-        }
-        
-        if newPage.currentPage == 0 || newPage.isFirst {
-            self.itemsRelay.accept(appendRows)
-            self.pageRelay.accept(newPage)
+
             return
         }
 
-        self.itemsRelay.accept(self.itemsRelay.value + appendRows)
-        self.pageRelay.accept(newPage)
+        if newPage.currentPage == 0 || newPage.isFirst {
+            self.items = appendRows
+            self.page = newPage
+            return
+        }
+
+        self.items += appendRows
+        self.page = newPage
     }
-    
-    func reloadPage(where item: Model) {
-        let possiblePage = ((item.indexPath.row / self.pageRelay.value.count) + self.pageRelay.value.firstPage) - 1
-        self.refreshPageRelay?.accept(self.pageRelay.value.reload(currentPage: possiblePage))
+}
+
+public extension Page {
+    var refreshObservable: Observable<MetaPage> {
+        let page = self.$page
+
+        return .merge(
+            self.refreshPageRelay
+                .asObservable(),
+            self.needsToLoadNextPage
+                .asObservable()
+                .map { page.wrappedValue }
+                .filter { $0.status == .next }
+                .do(onNext: {
+                    page.wrappedValue = $0.lock
+                })
+        )
+    }
+}
+
+public extension Page {
+    func reloadPage(where item: Element) {
+        let possiblePage = ((item.indexPath.row / self.page.count) + self.page.firstPage) - 1
+        self.refreshPageRelay.accept(self.page.reload(currentPage: possiblePage))
     }
 }
