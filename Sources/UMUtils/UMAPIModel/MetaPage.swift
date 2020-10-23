@@ -30,7 +30,7 @@ public enum MetaPageStatus {
     case reload
 }
 
-public class MetaPage: Codable {
+public struct MetaPage: Codable {
     public let currentPage: Int
     public let startIndex: Int
     public let lastPage: Int
@@ -39,7 +39,7 @@ public class MetaPage: Codable {
     public let status: MetaPageStatus
     public let firstPage: Int
 
-    public required init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         self.currentPage = try container.decode(.currentPage)
@@ -68,29 +68,29 @@ public class MetaPage: Codable {
     }
     
     public static var empty: MetaPage {
-        return .init()
+        .init()
     }
     
     public var lock: MetaPage {
-        return self.edit {
+        self.edit {
             $0.status = .lock
         }
     }
     
     public var isEmpty: Bool {
-        return self.status == .empty
+        self.status == .empty
     }
     
     public var isLocked: Bool {
-        return self.status == .lock
+        self.status == .lock
     }
     
     public var isFirst: Bool {
-        return self.currentPage == self.firstPage
+        self.currentPage == self.firstPage
     }
     
     public var nextPage: Int {
-        return self.isEmpty ? 1 : self.currentPage + 1
+        self.isEmpty ? 1 : self.currentPage + 1
     }
     
     private init(original: MetaPage, editable: Editable) {
@@ -110,7 +110,7 @@ public class MetaPage: Codable {
     }
     
     public func reload(currentPage: Int) -> MetaPage {
-        return self.edit {
+        self.edit {
             $0.currentPage = currentPage
             $0.status = .reload
         }

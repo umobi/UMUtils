@@ -49,23 +49,23 @@ private struct ActivityToken<Element>: ObservableConvertibleType, Disposable {
  When all activities complete `false` will be sent.
  */
 // swiftlint:disable type_name
-public class ActivityIndicator: SharedSequenceConvertibleType {
+public struct ActivityIndicator: ObservableConvertibleType {
     public typealias Element = Bool
     public typealias SharingStrategy = DriverSharingStrategy
 
     private let _lock = NSRecursiveLock()
     private let _variable = BehaviorRelay(value: 0)
-    private let _loading: SharedSequence<SharingStrategy, Bool>
+    private let _loading: Observable<Bool>
 
     public init() {
-        _loading = _variable.asDriver()
+        _loading = _variable
             .map { $0 > 0 }
             .distinctUntilChanged()
     }
 
     // swiftlint:disable multiple_closures_with_trailing_closure
     fileprivate func trackActivityOfObservable<O: ObservableConvertibleType>(_ source: O) -> Observable<O.Element> {
-        return Observable.using({ [unowned self] () -> ActivityToken<O.Element> in
+        return Observable.using({ () -> ActivityToken<O.Element> in
             self.increment()
             return ActivityToken(source: source.asObservable(), disposeAction: self.decrement)
         }) { token in
@@ -85,13 +85,13 @@ public class ActivityIndicator: SharedSequenceConvertibleType {
         _lock.unlock()
     }
 
-    public func asSharedSequence() -> SharedSequence<SharingStrategy, Element> {
-        return _loading
+    public func asObservable() -> Observable<Element> {
+        self._loading
     }
 }
 
 extension ObservableConvertibleType {
     public func trackActivity(_ activityIndicator: ActivityIndicator) -> Observable<Element> {
-        return activityIndicator.trackActivityOfObservable(self)
+        activityIndicator.trackActivityOfObservable(self)
     }
 }
