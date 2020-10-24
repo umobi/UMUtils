@@ -35,3 +35,21 @@ public func Empty<Element>(outputType: Element.Type) -> Observable<Element> {
 public func Empty<Element>() -> Observable<Element> {
     .empty()
 }
+
+public struct AnyObservable<Element>: ObservableType {
+    private let observable: Observable<Element>
+
+    fileprivate init(_ observable: Observable<Element>) {
+        self.observable = observable
+    }
+
+    public func subscribe<Observer>(_ observer: Observer) -> Disposable where Observer : ObserverType, Self.Element == Observer.Element {
+        observable.subscribe(observer)
+    }
+}
+
+public extension ObservableConvertibleType {
+    func eraseToAnyObservable() -> AnyObservable<Element> {
+        .init(self.asObservable())
+    }
+}
