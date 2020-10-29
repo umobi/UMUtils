@@ -23,6 +23,7 @@
 import Foundation
 
 public extension Date.Style {
+    @frozen
     struct Month {
         private let date: Date
 
@@ -49,7 +50,8 @@ public extension Date.Style {
         }
     }
 
+    @inline(__always)
     var month: Month {
-        return .init(self.date)
+        .init(self.date)
     }
 }

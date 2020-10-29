@@ -24,6 +24,7 @@ import Foundation
 
 public extension NSNumber {
 
+    @inlinable
     var priceString: String {
         let numberFormatter = NumberFormatter()
         if #available(iOS 9.0, *) {
@@ -41,19 +42,22 @@ public extension NSNumber {
 }
 
 public extension Double {
+    @inlinable
     var priceString: String {
-        return (self as NSNumber).priceString
+        (self as NSNumber).priceString
     }
 }
 
 public extension Float {
+    @inlinable
     var priceString: String {
-        return (self as NSNumber).priceString
+        (self as NSNumber).priceString
     }
 }
 
 public extension Int {
+    @inlinable
     var priceString: String {
-        return (self as NSNumber).priceString
+        (self as NSNumber).priceString
     }
 }

@@ -23,10 +23,14 @@
 import Foundation
 
 public extension Bundle {
+    
+    @inline(__always) @inlinable
     var releaseVersion: String? {
-        return infoDictionary?["CFBundleShortVersionString"] as? String
+        infoDictionary?["CFBundleShortVersionString"] as? String
     }
+    
+    @inline(__always) @inlinable
     var buildVersion: String? {
-        return infoDictionary?["CFBundleVersion"] as? String
+        infoDictionary?["CFBundleVersion"] as? String
     }
 }

@@ -24,10 +24,12 @@ import Foundation
 import UIKit
 
 public extension NSAttributedString {
+    @inlinable
     func boldify(with string: String) -> NSAttributedString {
-        return self.setAttributes([.font: UIFont(name: "HelveticaNeue-Bold", size: 15)!], string: string)
+        self.setAttributes([.font: UIFont(name: "HelveticaNeue-Bold", size: 15)!], string: string)
     }
 
+    @inlinable
     func setAttributes(_ attrs: [NSAttributedString.Key : Any]?, string: String) -> NSAttributedString {
         let nsString = self.string as NSString
         let attributedString = NSMutableAttributedString(attributedString: self)
@@ -43,22 +45,26 @@ public extension NSAttributedString {
 }
 
 public extension NSString {
+    @inlinable
     func boldify(with string: String) -> NSAttributedString {
         let attributedString = NSAttributedString(string: self as String)
         return attributedString.boldify(with:string)
     }
 
+    @inlinable
     func setAttributes(_ attrs: [NSAttributedString.Key : Any]?, string: String) -> NSAttributedString {
-        return NSAttributedString(string: self as String).setAttributes(attrs, string: string)
+        NSAttributedString(string: self as String).setAttributes(attrs, string: string)
     }
 }
 
 public extension String {
+    @inline(__always) @inlinable
     func boldify(with string: String) -> NSAttributedString {
-        return (self as NSString).boldify(with:string)
+        (self as NSString).boldify(with:string)
     }
 
+    @inline(__always) @inlinable
     func setAttributes(_ attrs: [NSAttributedString.Key : Any]?, string: String) -> NSAttributedString {
-        return (self as NSString).setAttributes(attrs, string: string)
+        (self as NSString).setAttributes(attrs, string: string)
     }
 }

@@ -55,7 +55,6 @@ extension ViewModelBindable {
 
 private extension ViewModelBindable {
     func registerBinding(viewModel: ViewModel) {
-        viewModel.binders()
         bindViewModel(viewModel: viewModel)
     }
 }

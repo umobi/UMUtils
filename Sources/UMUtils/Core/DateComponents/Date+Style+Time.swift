@@ -23,8 +23,9 @@
 import Foundation
 
 public extension Date.Style {
-
+    @frozen
     struct Time {
+        @frozen
         public enum Granularity {
             case hour(Int)
             case minute(Int)
@@ -55,12 +56,14 @@ public extension Date.Style {
         }
     }
 
+    @inline(__always)
     var hour: Time {
-        return .init(.hour(self.date.components.hour))
+        .init(.hour(self.date.components.hour))
     }
 
+    @inline(__always)
     var minute: Time {
-        return .init(.minute(self.date.components.minute))
+        .init(.minute(self.date.components.minute))
     }
 
 }

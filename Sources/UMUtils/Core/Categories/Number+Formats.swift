@@ -24,6 +24,7 @@ import Foundation
 
 public extension Int {
 
+    @inlinable
     var humanTime: String {
 
         guard self >= 60 else {
@@ -39,6 +40,7 @@ public extension Int {
         return "\(hours)h \(minutes)m"
     }
 
+    @inlinable
     var time: String {
         guard self >= 60 else {
             return "00:\(String(format: "%02d", self))"
@@ -51,7 +53,9 @@ public extension Int {
 }
 
 public extension Double {
+
+    @inline(__always) @inlinable
     var humanTime: String {
-        return Int(self).humanTime
+        Int(self).humanTime
     }
 }

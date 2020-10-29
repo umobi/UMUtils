@@ -24,12 +24,14 @@ import Foundation
 
 public extension Double {
     /// Rounds the double to decimal places value
+    @inlinable
     func roundTo(places: Int) -> Double {
         let divisor = pow(10.0, Double(places))
         return (self * divisor).rounded() / divisor
     }
 
+    @inline(__always) @inlinable
     var rounded: Double {
-        return self.roundTo(places: 1)
+        self.roundTo(places: 1)
     }
 }

@@ -19,291 +19,114 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-import Foundation
+
 import UIKit
-import ConstraintBuilder
-import UIContainer
 import UICreator
 
-open class ActivityView: View {
+public struct UMActivity: UICView {
+    @Value private var timer: Timer? = nil
 
-    private weak var contentView: UIView!
-    public private(set) var size: Size = .medium
+    @Relay private var isAnimating: Bool
+    @Relay private var blurEffect: UIBlurEffect.Style
+    @Relay private var color: UIColor
 
-    private weak var stackView: UIStackView!
-    weak var activityView: UIActivityIndicatorView!
-    public private(set) weak var titleView: UILabel?
-    private weak var contentTitleView: UIView?
+    private let contents: (() -> ViewCreator)?
 
-    public private(set) var mode: Mode = .forever
+    private let style: UIActivityIndicatorView.Style
+    private let mode: Mode
+    private let size: Size
 
-    public weak var blur: BlurView!
-    public override var backgroundColor: UIColor? {
-        get { self.contentView.backgroundColor }
-        set { self.contentView.backgroundColor = newValue }
-    }
+    public init(
+        _ blurEffect: Relay<UIBlurEffect.Style>,
+        style: UIActivityIndicatorView.Style = .gray,
+        color: Relay<UIColor>,
+        size: Size = .medium,
+        mode: Mode = .forever,
+        isAnimating: Relay<Bool>,
+        @UICViewBuilder contents: @escaping () -> ViewCreator) {
 
-    open var activityColor: UIColor? {
-        get { return self.activityView?.color }
-        set { self.activityView?.color = newValue }
-    }
-
-    override public func prepare() {
-        super.prepare()
-
-        self.prepareContent()
-        self.prepareActivity()
-
-        self.setContentViews(self.defaultContentViews())
-    }
-
-    open func setSize(_ size: Size) {
+        self._blurEffect = blurEffect
+        self._isAnimating = isAnimating
+        self._color = color
+        self.style = style
         self.size = size
-        self.activityView?.transform = .init(scaleX: self.size.factor, y: self.size.factor)
-    }
-
-    open func setMode(_ mode: Mode) {
         self.mode = mode
-
-        if self.isAnimating {
-            if case .until(let time) = self.mode {
-                self.setInterruption(time)
-            }
-
-            if case .forever = self.mode {
-                self.killInterruption()
-            }
-        }
+        self.contents = contents
     }
 
-    func prepareContent() {
-        let contentView = UIView()
-        let rounder = RounderView(contentView, radius: 5)
-        CBSubview(self).addSubview(rounder)
+    public init(
+        _ blurEffect: UIBlurEffect.Style,
+        style: UIActivityIndicatorView.Style = .gray,
+        color: UIColor,
+        size: Size = .medium,
+        mode: Mode = .forever,
+        isAnimating: Relay<Bool>) {
 
-        Constraintable.activate {
-            rounder.cbuild
-                .edges
-        }
-
-        self.contentView = contentView
-
+        self._blurEffect = .constant(blurEffect)
+        self._isAnimating = isAnimating
+        self._color = .constant(color)
+        self.style = style
+        self.size = size
+        self.mode = mode
+        self.contents = nil
     }
 
-    private var timer: Timer? = nil
-    func setInterruption(_ time: TimeInterval) {
+    private func setInterruption(_ time: TimeInterval) {
         guard self.isAnimating else {
             return
         }
 
         self.timer?.invalidate()
-        self.timer = Timer.scheduledTimer(withTimeInterval: time, repeats: false, block: { [weak self] _ in
-            self?.hide()
-        })
+        self.timer = Timer.scheduledTimer(
+            withTimeInterval: time,
+            repeats: false,
+            block: { _ in self.isAnimating.toggle() }
+        )
     }
 
-    func killInterruption() {
-        self.timer?.invalidate()
-        self.timer = nil
-    }
+    public var body: ViewCreator {
+        UICCenter {
+            UICRounder(radius: 7.5) {
+                UICZStack {
+                    UICBlur(self.$blurEffect)
 
-    func prepareActivity() {
-        let blur = BlurView(blur: .light)
+                    UICVScroll {
+                        UICVStack {
+                            UICActivity(.gray, isAnimating: self.$isAnimating)
+                                .transform(.init(scaleX: self.size.factor, y: self.size.factor))
+                                .color(self.$color)
+                                .onInTheScene { _ in
+                                    guard case .until(let timeInterval) = self.mode else {
+                                        return
+                                    }
 
-        self.blur = blur
+                                    self.$isAnimating.distinctSync {
+                                        guard $0 else {
+                                            self.killInterruption()
+                                            return
+                                        }
 
-        CBSubview(self.contentView).addSubview(blur)
+                                        self.setInterruption(timeInterval)
+                                    }
+                                }
 
-        Constraintable.activate {
-            blur.cbuild
-                .edges
-        }
-
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.spacing = 0
-        let scroll = ScrollView(stackView, axis: .vertical)
-
-        CBSubview(self.contentView).addSubview(scroll)
-
-        Constraintable.activate {
-            scroll.cbuild
-                .edges
-        }
-
-        self.stackView = stackView
-    }
-
-    public func setContentViews(_ views: [UIView]) {
-        self.stackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        views.forEach {
-            CBSubview(self.stackView)?.addArrangedSubview($0)
-        }
-    }
-
-    open func defaultContentViews() -> [UIView] {
-        let activity = UIActivityIndicatorView(style: {
-            #if os(iOS)
-            return .gray
-            #endif
-
-            #if os(tvOS)
-            return .white
-            #endif
-        }())
-        let titleLabel = UILabel()
-
-        activity.transform = .init(scaleX: self.size.factor, y: self.size.factor)
-        titleLabel.textAlignment = .center
-        titleLabel.numberOfLines = 0
-
-        [activity, titleLabel].forEach {
-            $0.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-            $0.setContentHuggingPriority(.required, for: .vertical)
-            $0.setContentCompressionResistancePriority(.required, for: .vertical)
-            $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-        }
-
-        self.activityView = activity
-        self.titleView = titleLabel
-
-        return [SpacerView({
-            let content = ContentView(activity, contentMode: .center)
-
-            Constraintable.activate {
-                activity.cbuild
-                    .leading
-                    .trailing
-                    .priority(.defaultHigh)
-
-                activity.cbuild
-                    .top
-                    .priority(.defaultHigh)
-            }
-
-            return content
-        }(), margin: .init(spacing: 30)), {
-            let spacer = SpacerView({
-                let content = ContentView(titleLabel, contentMode: .center)
-
-                Constraintable.activate {
-                    titleLabel.cbuild
-                        .leading
-                        .trailing
-                        .priority(.defaultHigh)
-
-                    titleLabel.cbuild
-                        .width
-                        .lessThanOrEqualTo(200)
+                            if let contents = self.contents {
+                                contents()
+                            }
+                        }
+                    }
                 }
-
-                return content
-            }(), margin: .init(top: 0, bottom: 15, leading: 15, trailing: 15))
-            spacer.isHidden = true
-            self.contentTitleView = spacer
-            return spacer
-        }()]
-    }
-
-    public func setText(_ text: String?) {
-        guard let text = text, !text.isEmpty else {
-            self.contentTitleView?.isHidden = true
-            return
-        }
-
-        self.titleView?.text = text
-        self.contentTitleView?.isHidden = false
-    }
-
-    open func start() {
-        self.activityView.startAnimating()
-
-        if case .until(let time) = self.mode {
-            self.setInterruption(time)
-        }
-    }
-
-    open func stop() {
-        self.activityView.stopAnimating()
-        self.killInterruption()
-    }
-
-    open var isAnimating: Bool {
-        return self.activityView.isAnimating
-    }
-
-    public func show(inViewController view: UIViewController!) {
-        let controller = ContainerController(self)
-        controller.modalPresentationStyle = .overFullScreen
-        controller.modalTransitionStyle = {
-            #if os(iOS)
-            return .partialCurl
-            #endif
-            #if os(tvOS)
-            return .coverVertical
-            #endif
-        }()
-        view.present(controller, animated: true, completion: {
-            self.start()
-        })
-    }
-
-    weak var container: Container? = nil
-    public func show(inView view: UIView!) {
-        let container = Container(in: nil, loadHandler: { self })
-        CBSubview(view).addSubview(container)
-
-        Constraintable.activate {
-            container.cbuild
-                .edges
-        }
-
-        self.start()
-        self.container = container
-    }
-
-    public func hide() {
-        if self.parent == nil {
-            self.stop()
-            self.container?.removeFromSuperview()
-            return
-        }
-
-        guard let container = self.parent as? ContainerController<ActivityView> else {
-            self.stop()
-            return
-        }
-
-        container.dismiss(animated: true, completion: {
-            self.stop()
-        })
-    }
-}
-
-extension ActivityView {
-    class Container: ContainerView<ActivityView> {
-        override func loadView<T>(_ view: T) -> CBView where T : CBView {
-            let contentView = UIView()
-
-            let center = ContentView(view, contentMode: .center)
-            CBSubview(contentView).addSubview(center)
-
-            Constraintable.activate {
-                center.cbuild
-                    .edges
             }
-
-            center.layer.shadowOffset = .init(width: 1, height: 2)
-            center.layer.shadowOpacity = 0.1
-            center.layer.shadowRadius = 3
-
-            return contentView
         }
+        .isHidden(self.$isAnimating)
+        .shadowOffset(x: 1, y: 2)
+        .shadowOcupacity(0.1)
+        .shadowRadius(3)
     }
 }
 
-
-public extension ActivityView {
+public extension UMActivity {
+    @frozen
     enum Size {
         case small
         case medium
@@ -322,23 +145,72 @@ public extension ActivityView {
     }
 }
 
-public extension ActivityView {
+public extension UMActivity {
+    @frozen
     enum Mode {
         case forever
         case until(TimeInterval)
     }
 }
 
-extension ActivityView: ViewControllerType {
-    public var content: ViewControllerMaker {
-        return .dynamic { [weak self] in
-            let container = Container(in: $0, loadHandler: { self })
-            CBSubview($0.view).addSubview(container)
+extension UMActivity {
 
-            Constraintable.activate {
-                container.cbuild
-                    .edges
+    private func killInterruption() {
+        self.timer?.invalidate()
+        self.timer = nil
+    }
+}
+
+public extension UIViewCreator {
+    @inlinable
+    func activityIndicator(
+        _ blurEffect: Relay<UIBlurEffect.Style>,
+        style: UIActivityIndicatorView.Style = .gray,
+        color: Relay<UIColor>,
+        size: UMActivity.Size = .medium,
+        mode: UMActivity.Mode = .forever,
+        isAnimating: Relay<Bool>,
+        @UICViewBuilder contents: @escaping () -> ViewCreator
+    ) -> UICAnyView {
+
+        UICAnyView(
+            UICZStack {
+                self.insets()
+
+                UMActivity(
+                    blurEffect, style: style,
+                    color: color,
+                    size: size,
+                    mode: mode,
+                    isAnimating: isAnimating,
+                    contents: contents
+                )
             }
-        }
+        )
+    }
+
+    @inlinable
+    func activityIndicator(
+        _ blurEffect: UIBlurEffect.Style,
+        style: UIActivityIndicatorView.Style = .gray,
+        color: UIColor,
+        size: UMActivity.Size = .medium,
+        mode: UMActivity.Mode = .forever,
+        isAnimating: Relay<Bool>
+    ) -> UICAnyView {
+
+        UICAnyView(
+            UICZStack {
+                self.insets()
+
+                UMActivity(
+                    blurEffect, style: style,
+                    color: color,
+                    size: size,
+                    mode: mode,
+                    isAnimating: isAnimating
+                )
+            }
+        )
     }
 }

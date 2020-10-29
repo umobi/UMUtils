@@ -53,7 +53,7 @@ public extension NSAttributedString {
 }
 
 public class AttributedStringCache {
-    var cache: OrderedArray<Item> = .init(.orderedAscending)
+    var cache: BinaryArray<Item> = .init(.orderedAscending)
 
     public static var shared: AttributedStringCache = {
         return .init()
@@ -180,12 +180,14 @@ public extension String {
 }
 
 public extension String {
+    @inline(__always) @inlinable
     func nsrange(of string: String) -> NSRange {
         (self as NSString).range(of: string)
     }
 
+    @inline(__always) @inlinable
     var nsrange: NSRange {
-        return self.nsrange(of: self)
+        self.nsrange(of: self)
     }
 }
 

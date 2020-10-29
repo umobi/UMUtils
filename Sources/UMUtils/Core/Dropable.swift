@@ -20,43 +20,20 @@
 // THE SOFTWARE.
 //
 
-import RxSwift
-import RxCocoa
-import UIContainer
-import UIKit
+import Foundation
 
-public extension Reactive where Base: ActivityView {
+public protocol Dropable {
+    var dropableId: String { get }
+    var title: String { get }
+}
 
-    var animating: AnyObserver<Bool> {
-        return AnyObserver { event in
-            MainScheduler.ensureExecutingOnScheduler()
+extension Equatable where Self : Dropable {
+}
 
-            switch event {
-            case .next(let value):
-                if value {
-                    guard !self.base.isAnimating else {
-                        return
-                    }
+public func == (lhs: Dropable?, rhs: Dropable?) -> Bool {
+    lhs?.dropableId == rhs?.dropableId
+}
 
-                    self.base.show(inView: UIApplication.shared.keyWindow)
-                    return
-                }
-
-                guard self.base.isAnimating else {
-                    return
-                }
-
-                self.base.hide()
-            case .error(let error):
-                let error = "Binding error to UI: \(error)"
-                #if DEBUG
-                    fatalError(error)
-                #else
-                    print(error)
-                #endif
-            case .completed:
-                break
-            }
-        }
-    }
+public func != (lhs: Dropable?, rhs: Dropable?) -> Bool {
+    lhs?.dropableId != rhs?.dropableId
 }

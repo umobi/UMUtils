@@ -23,43 +23,52 @@
 import Foundation
 
 public extension Date {
+    @frozen
     struct Components {
         public let date: Date
-
+        
         fileprivate init(_ date: Date) {
             self.date = date
         }
 
+        @inline(__always)
         public var weekday: Int {
-            return Calendar.current.component(.weekday, from: self.date)
+            Calendar.current.component(.weekday, from: self.date)
         }
 
+        @inline(__always)
         public var day: Int {
-            return Calendar.current.component(.day, from: self.date)
+            Calendar.current.component(.day, from: self.date)
         }
 
+        @inline(__always)
         public var month: Int {
-            return Calendar.current.component(.month, from: self.date)
+            Calendar.current.component(.month, from: self.date)
         }
 
+        @inline(__always)
         public var year: Int {
-            return Calendar.current.component(.year, from: self.date)
+            Calendar.current.component(.year, from: self.date)
         }
 
+        @inline(__always)
         public var hour: Int {
-            return Calendar.current.component(.hour, from: self.date)
+            Calendar.current.component(.hour, from: self.date)
         }
 
+        @inline(__always)
         public var minute: Int {
-            return Calendar.current.component(.minute, from: self.date)
+            Calendar.current.component(.minute, from: self.date)
         }
 
+        @inline(__always)
         public var second: Int {
-            return Calendar.current.component(.second, from: self.date)
+            Calendar.current.component(.second, from: self.date)
         }
 
+        @inline(__always)
         public var nanosecond: Int {
-            return Calendar.current.component(.nanosecond, from: self.date)
+            Calendar.current.component(.nanosecond, from: self.date)
         }
 
         public func edit(_ editing: (Components.Editable) -> Void) -> Components {
@@ -96,8 +105,9 @@ public extension Date {
         }
     }
 
+    @inline(__always)
     var components: Components {
-        return .init(self)
+        .init(self)
     }
 }
 

@@ -36,7 +36,7 @@ public extension CLLocationCoordinate2D {
     }
 
     var asData: Data {
-        return NSKeyedArchiver.archivedData(withRootObject: self.asDictionary)
+        NSKeyedArchiver.archivedData(withRootObject: self.asDictionary)
     }
 
     init(dict: CLLocationCoordinateDictionary) {

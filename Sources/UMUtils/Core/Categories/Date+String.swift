@@ -21,6 +21,7 @@
 //
 
 import Foundation
+
 private let dateFormatter = DateFormatter()
 
 public extension Date {

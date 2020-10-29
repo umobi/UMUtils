@@ -24,18 +24,22 @@ import Foundation
 import RxCocoa
 import RxSwift
 
+@inline(__always) @inlinable
 public func Just<Element>(_ element: Element) -> Observable<Element> {
     .just(element)
 }
 
+@inline(__always) @inlinable
 public func Empty<Element>(outputType: Element.Type) -> Observable<Element> {
     .empty()
 }
 
+@inline(__always) @inlinable
 public func Empty<Element>() -> Observable<Element> {
     .empty()
 }
 
+@frozen
 public struct AnyObservable<Element>: ObservableType {
     private let observable: Observable<Element>
 
@@ -49,6 +53,7 @@ public struct AnyObservable<Element>: ObservableType {
 }
 
 public extension ObservableConvertibleType {
+    @inline(__always)
     func eraseToAnyObservable() -> AnyObservable<Element> {
         .init(self.asObservable())
     }

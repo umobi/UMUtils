@@ -22,15 +22,19 @@
 
 import Foundation
 
-public struct OrderedArray<Element: Comparable>: Collection {
+@frozen
+public struct BinaryArray<Element: Comparable>: Collection {
+    @inline(__always) @inlinable
     public func index(after i: Int) -> Int {
-        return i + 1
+        i + 1
     }
 
+    @inline(__always) @inlinable
     public var startIndex: Int {
-        return 0
+        .zero
     }
 
+    @inline(__always)
     public var endIndex: Int {
         self.lazyCount
     }
@@ -121,6 +125,7 @@ public struct OrderedArray<Element: Comparable>: Collection {
         self.lazyCount -= 1
     }
 
+    @inline(__always)
     public subscript(_ index: Int) -> Element {
         self.array[index]
     }

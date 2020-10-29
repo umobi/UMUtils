@@ -70,7 +70,6 @@ public extension SharedSequence where Element: APIResultWrapper {
     }
 }
 
-
 @available(iOS 12, *)
 public extension ObservableType where Element: APIResultWrapper {
 
@@ -89,7 +88,7 @@ public extension ObservableType where Element: APIResultWrapper {
     }
 }
 
-@available(iOS 12, *)
+@frozen @available(iOS 12, *)
 public enum APIRelativeTimeoutTime {
     case seconds(Int)
     case forever
