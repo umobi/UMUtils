@@ -67,7 +67,7 @@ public struct IndicatorRelay: ObservableConvertibleType {
 
     @inline(__always)
     public var projectedValue: Relay<Bool> {
-        self.$requestsCount.map { $0 == .zero }
+        self.$requestsCount.map { $0 > .zero }
     }
 
     public func asObservable() -> Observable<Element> {
