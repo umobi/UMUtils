@@ -33,7 +33,7 @@ public struct PresentMaker<Content> where Content: View {
     let onCompletion: (() -> Void)?
     let animated: Bool
 
-    init(_ content: @escaping () -> Content) {
+    public init(_ content: @escaping () -> Content) {
         self.content = content()
         self.onCompletion = nil
         if #available(iOS 13, tvOS 13, *) {
