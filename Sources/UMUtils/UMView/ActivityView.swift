@@ -91,34 +91,36 @@ public struct UMActivity: UICView {
                     UICBlur(self.$blurEffect)
 
                     UICVScroll {
-                        UICVStack {
-                            UICActivity(.gray, isAnimating: self.$isAnimating)
-                                .transform(.init(scaleX: self.size.factor, y: self.size.factor))
-                                .color(self.$color)
-                                .onInTheScene { _ in
-                                    guard case .until(let timeInterval) = self.mode else {
-                                        return
-                                    }
-
-                                    self.$isAnimating.distinctSync {
-                                        guard $0 else {
-                                            self.killInterruption()
+                        UICSpacer(spacing: 20 * size.factor) {
+                            UICVStack {
+                                UICActivity(.gray, isAnimating: self.$isAnimating)
+                                    .transform(.init(scaleX: self.size.factor, y: self.size.factor))
+                                    .color(self.$color)
+                                    .onInTheScene { _ in
+                                        guard case .until(let timeInterval) = self.mode else {
                                             return
                                         }
 
-                                        self.setInterruption(timeInterval)
-                                    }
-                                }
+                                        self.$isAnimating.distinctSync {
+                                            guard $0 else {
+                                                self.killInterruption()
+                                                return
+                                            }
 
-                            if let contents = self.contents {
-                                contents()
+                                            self.setInterruption(timeInterval)
+                                        }
+                                    }
+
+                                if let contents = self.contents {
+                                    contents()
+                                }
                             }
                         }
                     }
                 }
             }
         }
-        .isHidden(self.$isAnimating)
+        .isHidden(!self.$isAnimating)
         .shadowOffset(x: 1, y: 2)
         .shadowOcupacity(0.1)
         .shadowRadius(3)
