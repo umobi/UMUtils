@@ -26,15 +26,19 @@ import Combine
 
 public extension Request {
 
+    @frozen
     enum PublisherLodingType {
         case boolean(ActivityPublisher)
     }
 
+    @frozen
     struct Publisher<Output>: Combine.Publisher where Output: Decodable {
         public typealias Failure = Error
 
         let request: AnyRequest<Data>
         let loadingType: PublisherLodingType
+
+        @usableFromInline
         init(_ request: AnyRequest<Data>,_ type: PublisherLodingType) {
             self.request = request
             self.loadingType = type
@@ -100,16 +104,18 @@ extension Request {
 }
 
 public extension Request {
+    @inline(__always) @inlinable 
     func publisher<Object>(_ decodable: Object.Type, isLoading: ActivityPublisher = .init()) -> Request.Publisher<Object> where Object: Decodable {
         .init(self, .boolean(isLoading))
     }
 }
 
 public extension Request {
-    func apiPublisher<Object>(_ decodable: Object.Type, isLoading: ActivityPublisher = .init()) -> AnyPublisher<APIResult<Object>, Never> where Object: Decodable {
-        self.publisher(Object.self, isLoading: isLoading)
+    @inlinable
+    func apiPublisher<APISuccess>(_ decodable: APISuccess.Type, isLoading: ActivityPublisher = .init()) -> AnyPublisher<APIResult<APISuccess>, Never> where APISuccess: APIRawObject {
+        self.publisher(APISuccess.self, isLoading: isLoading)
             .map { .success($0) }
-            .catch { result -> AnyPublisher<APIResult<Object>, Never> in
+            .catch { result -> AnyPublisher<APIResult<APISuccess>, Never> in
                 if let requestError = result as? RequestError, requestError.statusCode == 204 {
                     return Just(.empty)
                         .eraseToAnyPublisher()

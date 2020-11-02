@@ -78,7 +78,8 @@ public extension Publisher where Output: APIResultWrapper, Failure == Never {
 }
 
 public extension Publisher where Output: APIResultWrapper, Failure == Never {
-    func throwErrorToManager() -> AnyPublisher<Output, Failure> {
+    @inlinable
+    func throwErrorToAPIManager() -> AnyPublisher<Output, Failure> {
         self.map {
             if let error = $0.error {
                 APIErrorManager.shared?.didReviceError(error)

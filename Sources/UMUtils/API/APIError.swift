@@ -22,19 +22,27 @@
 
 import Foundation
 
-public struct APIError: Codable {
+public protocol APIRawError: Decodable {
+    var nsError: NSError { get }
+}
+
+@frozen
+public struct APIError: Codable, APIRawError {
     private let type: APIErrorType
 
+    @inline(__always)
     public var code: Int {
-        return self.type.code
+        self.type.code
     }
 
+    @inline(__always)
     public var title: String {
-        return self.type.message
+        self.type.message
     }
 
+    @inline(__always)
     public var messages: [String]? {
-        return self.type.messages
+        self.type.messages
     }
     
     public let exception: APIException?
@@ -43,9 +51,11 @@ public struct APIError: Codable {
         if code == 401 {
             return "Sua sessão expirou, faça o login novamente."
         }
+
         if let messages = self.messages {
             return "- " + messages.joined(separator: "\n- ")
         }
+
         return ""
     }
     
@@ -106,11 +116,13 @@ extension APIError {
 }
 
 extension APIError {
-    private struct Error: Codable {
+    @usableFromInline
+    struct Error: Codable {
         let code: Int
         let message: String
         let messages: [String]?
 
+        @usableFromInline
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
@@ -132,7 +144,8 @@ extension APIError {
         }
     }
 
-    private enum APIErrorType {
+    @usableFromInline
+    enum APIErrorType {
         case api(APIError.Error)
         case error(Swift.Error)
 
@@ -162,13 +175,5 @@ extension APIError {
                 return []
             }
         }
-    }
-}
-
-public struct MessageError: Swift.Error {
-    public let content: String
-
-    public init(content: String) {
-        self.content = content
     }
 }

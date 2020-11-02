@@ -20,42 +20,17 @@
 // THE SOFTWARE.
 //
 
-import Combine
+import Foundation
 
-// MARK: - isSucceeded()
+@frozen
+public struct StringError: Error, ExpressibleByStringInterpolation {
+    private let content: String
 
-extension Publisher {
-    @inlinable
-    public func isSucceeded() -> Publishers.ReplaceError<Publishers.Map<Self, Bool>> {
-        self.map(true)
-            .replaceError(with: false)
+    public init(stringLiteral value: String) {
+        self.content = value
     }
-}
 
-
-// MARK: - map()
-
-extension Publisher {
-    @inline(__always) @inlinable
-    public func map<T>(_ element: T) -> Publishers.Map<Self, T> {
-        self.map { _ in element }
-    }
-}
-
-// MARK: - mapVoid()
-
-extension Publisher {
-    @inline(__always) @inlinable
-    public func mapVoid() -> Publishers.Map<Self, Void> {
-        self.map(Void())
-    }
-}
-
-// MARK: - ignoreErrors()
-
-extension Publisher {
-    @inline(__always) @inlinable
-    public func ignoreErrors() -> Publishers.Catch<Self, Empty<Self.Output, Self.Failure>> {
-        self.catch { _ in Empty<Self.Output, Self.Failure>() }
+    public init<S>(_ content: S) where S : StringProtocol {
+        self.content = String(content)
     }
 }

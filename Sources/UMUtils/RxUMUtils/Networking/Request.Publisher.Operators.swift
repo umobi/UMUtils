@@ -24,6 +24,7 @@ import Foundation
 import Combine
 
 public extension Publisher where Output: APIResultWrapper, Failure == Never {
+    @inlinable
     func filter(urlErrorCodes: Set<URLError.Code>) -> AnyPublisher<Output, Failure> {
         self.filter {
             guard
@@ -37,12 +38,14 @@ public extension Publisher where Output: APIResultWrapper, Failure == Never {
         .eraseToAnyPublisher()
     }
 
+    @inline(__always) @inlinable
     func filter(urlErrorCodes: URLError.Code...) -> AnyPublisher<Output, Failure> {
         self.filter(urlErrorCodes: .init(urlErrorCodes))
     }
 }
 
 public extension Publisher where Output: APIResultWrapper, Failure == Never {
+    @inlinable
     func successOrError<T>() -> AnyPublisher<T, Error> where Output == APIResult<T>, T: Decodable {
         self.tryMap { result -> Output in
             if case .error(let error) = result {

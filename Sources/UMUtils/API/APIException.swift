@@ -22,6 +22,7 @@
 
 import Foundation
 
+@frozen
 public struct APIException: Codable {
     
     public let line: Int
@@ -31,7 +32,8 @@ public struct APIException: Codable {
     public let message: String
     
     public let trace: [String]?
-    
+
+    @inlinable
     public init(line: Int, severity: String, type: String, file: String, message: String, trace: [String]?) {
         self.line = line
         self.severity = severity
@@ -41,6 +43,7 @@ public struct APIException: Codable {
         self.trace = trace
     }
 
+    @inlinable
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
@@ -52,6 +55,7 @@ public struct APIException: Codable {
         self.trace = try? container.decode(.trace)
     }
 
+    @inlinable
     public func encode(to encoder: Encoder) {
         let container = encoder.container(keyedBy: CodingKeys.self).wrapper
 
@@ -65,6 +69,7 @@ public struct APIException: Codable {
 }
 
 extension APIException {
+    @usableFromInline
     enum CodingKeys: String, CodingKey {
         case line
         case severity

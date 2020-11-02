@@ -23,7 +23,7 @@
 import Foundation
 import SwiftUI
 
-@propertyWrapper
+@propertyWrapper @frozen
 public struct MaskedText: DynamicProperty {
     @State private var storage: String
     private let mask: MaskType
@@ -47,6 +47,7 @@ public struct MaskedText: DynamicProperty {
         })
     }
 
+    @inline(__always)
     private func process(_ value: String) {
         // do some something here or in background queue
         self.storage = value

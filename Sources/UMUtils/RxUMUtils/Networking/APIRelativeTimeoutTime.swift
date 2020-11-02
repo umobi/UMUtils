@@ -23,10 +23,12 @@
 import Foundation
 import Combine
 
+@frozen
 public enum APIRelativeTimeoutTime {
     case seconds(Int)
     case forever
 
+    @usableFromInline
     func timeout<Publisher, Scheduler>(_ publisher: Publisher, scheduler: Scheduler) -> AnyPublisher<Publisher.Output, Publisher.Failure> where Publisher: Combine.Publisher, Scheduler: Combine.Scheduler {
         switch self {
         case .forever:

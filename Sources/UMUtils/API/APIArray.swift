@@ -22,21 +22,18 @@
 
 import Foundation
 
-public protocol APICollection: APIRawObject {
-    associatedtype Element: Decodable
-
-    var data: [Element] { get }
-}
-
-public struct APIArray<Element: Decodable>: APICollection {
+@frozen
+public struct APIArray<Element: Decodable>: APIRawObject {
     public let data: [Element]
     public let meta: MetaPage?
 
+    @inlinable
     public init(data: [Element], meta metaPage: MetaPage? = nil) {
         self.data = data
         self.meta = metaPage
     }
 
+    @inlinable
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
@@ -46,6 +43,7 @@ public struct APIArray<Element: Decodable>: APICollection {
 }
 
 public extension APIArray {
+    @frozen
     enum CodingKeys: String, CodingKey {
         case data
         case meta

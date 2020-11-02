@@ -132,15 +132,23 @@ public struct ActivityView: View {
     }
 }
 
-private extension ActivityView {
+extension ActivityView {
+    @usableFromInline
     class Editable {
         #if os(iOS) || os(tvOS)
+        @usableFromInline
         var color: UIColor
         #elseif os(macOS)
+        @usableFromInline
         var size: NSControl.ControlSize
         #endif
+        @usableFromInline
         var title: String?
+
+        @usableFromInline
         var titleColor: Color?
+
+        @usableFromInline
         var titleFont: Font?
 
         init(_ original: ActivityView) {
@@ -156,7 +164,8 @@ private extension ActivityView {
         }
     }
 
-    func edit(_ edit: @escaping (Editable) -> Void) -> Self {
+    @inline(__always) @usableFromInline
+    func edit(_ edit: (Editable) -> Void) -> Self {
         let editable = Editable(self)
         edit(editable)
         return .init(self, editable: editable)
@@ -166,12 +175,14 @@ private extension ActivityView {
 public extension ActivityView {
 
     #if os(iOS) || os(tvOS)
+    @inlinable
     func color(_ color: UIColor) -> Self {
         self.edit {
             $0.color = color
         }
     }
     #elseif os(macOS)
+    @inlinable
     func size(_ size: NSControl.ControlSize) -> Self {
         self.edit {
             $0.size = size
@@ -179,18 +190,21 @@ public extension ActivityView {
     }
     #endif
 
+    @inlinable
     func title(_ title: String) -> Self {
         self.edit {
             $0.title = title
         }
     }
 
+    @inlinable
     func titleColor(_ color: Color) -> Self {
         self.edit {
             $0.titleColor = color
         }
     }
 
+    @inlinable
     func titleFont(_ font: Font) -> Self {
         self.edit {
             $0.titleFont = font

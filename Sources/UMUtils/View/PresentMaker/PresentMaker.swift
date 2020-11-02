@@ -25,15 +25,16 @@ import SwiftUI
 #if os(iOS) || os(tvOS)
 import UIKit
 
-public struct PresentMaker {
+@frozen
+public struct PresentMaker<Content> where Content: View {
     let presentingStyle: UIModalPresentationStyle
     let transitionStyle: UIModalTransitionStyle
-    let toView: AnyView?
+    let content: Content?
     let onCompletion: (() -> Void)?
     let animated: Bool
 
-    init() {
-        self.toView = nil
+    init(_ content: @escaping () -> Content) {
+        self.content = content()
         self.onCompletion = nil
         if #available(iOS 13, tvOS 13, *) {
             self.presentingStyle = .automatic
@@ -47,35 +48,33 @@ public struct PresentMaker {
     private init(_ original: PresentMaker, editable: Editable) {
         self.presentingStyle = editable.presentingStyle
         self.transitionStyle = editable.transitionStyle
-        self.toView = editable.toView
+        self.content = original.content
         self.onCompletion = editable.onCompletion
         self.animated = editable.animated
     }
 
-    private func edit(_ edit: @escaping (Editable) -> Void) -> Self {
-        let editable = Editable(self)
-        edit(editable)
-        return .init(self, editable: editable)
-    }
-
+    @inlinable
     public func presentingStyle(_ style: UIModalPresentationStyle) -> Self {
         self.edit {
             $0.presentingStyle = style
         }
     }
 
+    @inlinable
     public func transitionStyle(_ style: UIModalTransitionStyle) -> Self {
         self.edit {
             $0.transitionStyle = style
         }
     }
 
+    @inlinable
     public func onCompletion(_ handler: @escaping () -> Void) -> Self {
         self.edit {
             $0.onCompletion = handler
         }
     }
 
+    @inlinable
     public func animated(_ flag: Bool) -> Self {
         self.edit {
             $0.animated = flag
@@ -85,7 +84,7 @@ public struct PresentMaker {
     func viewController(onDismiss: @escaping () -> Void) -> UIViewController {
         let viewController = UIHostingController(rootView: ZStack {
             PresentedView(onDismiss: onDismiss)
-            self.toView!
+            self.content
         })
 
         viewController.modalPresentationStyle = self.presentingStyle
@@ -94,31 +93,39 @@ public struct PresentMaker {
         return viewController
     }
 
-    public func present<Content>(content: @escaping () -> Content) -> Self where Content: View {
-        self.edit {
-            $0.toView = AnyView(content())
-        }
-    }
-
-    private class Editable {
+    @usableFromInline
+    class Editable {
+        @usableFromInline
         var presentingStyle: UIModalPresentationStyle
+
+        @usableFromInline
         var transitionStyle: UIModalTransitionStyle
-        var toView: AnyView?
+
+        @usableFromInline
         var onCompletion: (() -> Void)?
+
+        @usableFromInline
         var animated: Bool
 
         init(_ present: PresentMaker) {
             self.presentingStyle = present.presentingStyle
             self.transitionStyle = present.transitionStyle
-            self.toView = present.toView
             self.onCompletion = present.onCompletion
             self.animated = present.animated
         }
     }
+
+    @inline(__always) @usableFromInline
+    func edit(_ edit: (Editable) -> Void) -> Self {
+        let editable = Editable(self)
+        edit(editable)
+        return .init(self, editable: editable)
+    }
 }
 
 public extension View {
-    func presentMaker(isPresented: Binding<Bool>, presentMaker: @escaping (PresentMaker) -> PresentMaker) -> some View {
+    @inline(__always)
+    func presentMaker<Content>(isPresented: Binding<Bool>, presentMaker: @escaping () -> PresentMaker<Content>) -> some View where Content: View {
         self.background(DefaultTransitionViewWrapper(isPresented: isPresented, presentMaker: presentMaker))
     }
 }

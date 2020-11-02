@@ -22,6 +22,7 @@
 
 import Foundation
 
+@frozen
 indirect public enum MaskType {
     case raw(String)
     case numeric(String)
@@ -79,7 +80,8 @@ public extension String {
         }
     }
 
+    @inline(__always)
     func mask(_ mask: MaskType) -> String {
-        return self.applyMask(mask).0
+        self.applyMask(mask).0
     }
 }

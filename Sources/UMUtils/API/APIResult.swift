@@ -26,8 +26,9 @@ public protocol APIResultWrapper {
     var error: Error? { get }
 }
 
-public enum APIResult<T: Decodable>: APIResultWrapper {
-    case success(T)
+@frozen
+public enum APIResult<APISuccess>: APIResultWrapper where APISuccess: APIRawObject {
+    case success(APISuccess)
     case error(Error)
     case empty
 }

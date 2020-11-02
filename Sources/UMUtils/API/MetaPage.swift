@@ -19,9 +19,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-
 import Foundation
 
+@frozen
 public enum MetaPageStatus {
     case empty
     case end
@@ -30,7 +30,8 @@ public enum MetaPageStatus {
     case reload
 }
 
-public class MetaPage: Codable {
+@frozen
+public struct MetaPage: Codable {
     public let currentPage: Int
     public let startIndex: Int
     public let lastPage: Int
@@ -39,7 +40,8 @@ public class MetaPage: Codable {
     public let status: MetaPageStatus
     public let firstPage: Int
 
-    public required init(from decoder: Decoder) throws {
+    @inlinable
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         self.currentPage = try container.decode(.currentPage)
@@ -56,7 +58,7 @@ public class MetaPage: Codable {
         }
 
     }
-    
+
     private init() {
         self.currentPage = 0
         self.startIndex = 0
@@ -66,33 +68,34 @@ public class MetaPage: Codable {
         self.firstPage = 0
         self.status = .empty
     }
-    
+
+    @inline(__always)
     public static var empty: MetaPage {
-        return .init()
+        .init()
     }
-    
+
     public var lock: MetaPage {
-        return self.edit {
+        self.edit {
             $0.status = .lock
         }
     }
-    
+
     public var isEmpty: Bool {
-        return self.status == .empty
+        self.status == .empty
     }
-    
+
     public var isLocked: Bool {
-        return self.status == .lock
+        self.status == .lock
     }
-    
+
     public var isFirst: Bool {
-        return self.currentPage == self.firstPage
+        self.currentPage == self.firstPage
     }
-    
+
     public var nextPage: Int {
-        return self.isEmpty ? 1 : self.currentPage + 1
+        self.isEmpty ? 1 : self.currentPage + 1
     }
-    
+
     private init(original: MetaPage, editable: Editable) {
         self.currentPage = editable.currentPage
         self.firstPage = original.firstPage
@@ -102,15 +105,17 @@ public class MetaPage: Codable {
         self.total = original.total
         self.startIndex = editable.currentPage * original.count
     }
-    
-    private func edit(_ editing: (Editable) -> Void) -> MetaPage {
+
+    @inline(__always) @usableFromInline
+    func edit(_ editing: (Editable) -> Void) -> MetaPage {
         let editable = Editable(currentPage: self.currentPage, status: self.status)
         editing(editable)
         return .init(original: self, editable: editable)
     }
-    
+
+    @inlinable
     public func reload(currentPage: Int) -> MetaPage {
-        return self.edit {
+        self.edit {
             $0.currentPage = currentPage
             $0.status = .reload
         }
@@ -119,9 +124,12 @@ public class MetaPage: Codable {
 
 public extension MetaPage {
     class Editable {
+        @usableFromInline
         var currentPage: Int
+
+        @usableFromInline
         var status: MetaPageStatus
-        
+
         internal init(currentPage: Int, status: MetaPageStatus) {
             self.currentPage = currentPage
             self.status = status
@@ -130,6 +138,7 @@ public extension MetaPage {
 }
 
 public extension MetaPage {
+    @frozen
     enum CodingKeys: String, CodingKey {
         case currentPage = "current_page"
         case startIndex = "from"

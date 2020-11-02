@@ -48,13 +48,13 @@ final class PrivateDefaultTranstionView: UIView {
     }
 }
 
-struct DefaultTransitionViewWrapper: UIViewRepresentable {
+struct DefaultTransitionViewWrapper<Content>: UIViewRepresentable where Content: View {
     @Binding var isPresented: Bool
-    let presentMaker: PresentMaker
+    let presentMaker: PresentMaker<Content>
 
-    init(isPresented: Binding<Bool>, presentMaker: @escaping (PresentMaker) -> PresentMaker) {
+    init(isPresented: Binding<Bool>, presentMaker: @escaping () -> PresentMaker<Content>) {
         self._isPresented = isPresented
-        self.presentMaker = presentMaker(PresentMaker())
+        self.presentMaker = presentMaker()
     }
 
     func makeUIView(context: Context) -> PrivateDefaultTranstionView {

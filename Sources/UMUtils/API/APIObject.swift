@@ -22,21 +22,18 @@
 
 import Foundation
 
-public protocol APIRawObject: Decodable {
-    associatedtype Object: Decodable
-
-    var data: Object { get }
-}
-
+@frozen
 public struct APIObject<Object: Decodable>: APIRawObject {
     public let data: Object
 
+    @inlinable
     public init(data: Object) {
         self.data = data
     }
 }
 
 public extension APIObject {
+    @frozen
     enum CodingKeys: String, CodingKey {
         case data
     }

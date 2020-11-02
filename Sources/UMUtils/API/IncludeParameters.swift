@@ -31,9 +31,10 @@ public protocol IncludeParameters {
 }
 
 public extension IncludeParameter {
+    @inlinable
     static func parameter(_ include: Self...) -> String {
-        return include[0..<include.count-1].reduce("") {
-            return "\($0)\($1.rawValue),"
-            } + include[include.count - 1].rawValue
+        include[0..<include.count-1].reduce("") {
+            "\($0)\($1.rawValue),"
+        } + include[include.count - 1].rawValue
     }
 }

@@ -23,8 +23,12 @@
 import Foundation
 import Combine
 
+@usableFromInline
 class SingleSubject<Publisher>: Subject where Publisher: Combine.Publisher {
+    @usableFromInline
     typealias Failure = Publisher.Failure
+
+    @usableFromInline
     typealias Output = Publisher.Output
 
     enum Payload {
@@ -39,6 +43,7 @@ class SingleSubject<Publisher>: Subject where Publisher: Combine.Publisher {
 
     var onValidPayload: ((Payload) -> Void)? = nil
 
+    @usableFromInline
     func send(_ value: Output) {
         guard case .empty = self.payload else {
             return
@@ -50,6 +55,7 @@ class SingleSubject<Publisher>: Subject where Publisher: Combine.Publisher {
         self.onValidPayload?(self.payload)
     }
 
+    @usableFromInline
     func send(completion: Subscribers.Completion<Failure>) {
         guard case .empty = self.payload else {
             return
@@ -66,6 +72,7 @@ class SingleSubject<Publisher>: Subject where Publisher: Combine.Publisher {
         self.onValidPayload?(self.payload)
     }
 
+    @usableFromInline
     func send(subscription: Subscription) {
         Swift.print("send(subscription:)", subscription)
     }
@@ -83,6 +90,7 @@ class SingleSubject<Publisher>: Subject where Publisher: Combine.Publisher {
         }
     }
 
+    @usableFromInline
     func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
         guard case .empty = self.payload else {
             Self.commit(payload: self.payload, subscriber: subscriber)
@@ -94,6 +102,7 @@ class SingleSubject<Publisher>: Subject where Publisher: Combine.Publisher {
         }
     }
 
+    @usableFromInline
     init(_ publisher: Publisher) {
         let cancellable = publisher.sink {
             self.send(completion: $0)
@@ -109,6 +118,7 @@ class SingleSubject<Publisher>: Subject where Publisher: Combine.Publisher {
 }
 
 public extension Publisher {
+    @inline(__always) @inlinable
     func single() -> AnyPublisher<Output, Failure> {
         SingleSubject(self)
             .eraseToAnyPublisher()

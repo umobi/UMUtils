@@ -1,4 +1,4 @@
-// swift-tools-version:5.2
+// swift-tools-version:5.3
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -12,7 +12,7 @@ let package = Package(
         .library(name: "UMUtils", targets: ["UMUtils"])
     ],
     dependencies: [
-        .package(name: "Request", url: "https://github.com/carson-katri/swift-request", .branch("master"))
+        .package(name: "Request", url: "https://github.com/carson-katri/swift-request", .upToNextMajor(from: "1.3.0"))
     ],
     targets: [
         .target(

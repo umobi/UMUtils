@@ -24,7 +24,8 @@ import Foundation
 import Combine
 import Request
 
-extension Publisher where Output: APIResultWrapper, Failure == Never {
+public extension Publisher where Output: APIResultWrapper, Failure == Never {
+    @inlinable
     func filter<R: RangeExpression>(statusCodes: R) -> AnyPublisher<Output, Failure> where R.Bound == Int {
         self.filter {
             guard
@@ -38,6 +39,7 @@ extension Publisher where Output: APIResultWrapper, Failure == Never {
         .eraseToAnyPublisher()
     }
 
+    @inlinable
     func filter(statusCode: Int) -> AnyPublisher<Output, Failure> {
         self.filter {
             guard
@@ -53,10 +55,12 @@ extension Publisher where Output: APIResultWrapper, Failure == Never {
 }
 
 public extension Publisher where Output: APIResultWrapper, Failure == Never {
+    @inline(__always) @inlinable
     func filterSuccessfulCodes() -> AnyPublisher<Output, Failure> {
         self.filter(statusCodes: 200...299)
     }
 
+    @inline(__always) @inlinable
     func filterSuccessfulAndRedirectCodes() -> AnyPublisher<Output, Failure> {
         self.filter(statusCodes: 200...399)
     }

@@ -81,12 +81,10 @@ public class APIBooleanLoadingState: APILoadingState {
 #endif
 
 public extension View {
-    func apiLoadingView<LoadingState: APILoadingState>(_ loadingState: LoadingState) -> AnyView {
-        AnyView(
-            APIView(
-                loadingState,
-                content: { self }
-            )
+    func apiLoadingView<LoadingState: APILoadingState>(_ loadingState: LoadingState) -> some View {
+        APIView(
+            loadingState,
+            content: { self }
         )
     }
 }

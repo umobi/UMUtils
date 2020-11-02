@@ -24,6 +24,7 @@ import Foundation
 import Request
 
 public extension Error {
+    @inlinable
     var isBecauseOfBadConnection: Bool {
         guard let urlError = self as? URLError else {
             return false
@@ -43,6 +44,7 @@ public protocol APIErrorDelegate {
 }
 
 public class APIErrorManager {
+    @usableFromInline
     private(set) static var shared: APIErrorManager?
     let delegate: APIErrorDelegate
 
@@ -54,12 +56,14 @@ public class APIErrorManager {
         self.shared = .init(delegate)
     }
 
+    @usableFromInline
     func didReviceError(_ error: Swift.Error) {
         self.delegate.didReviceError(error)
     }
 }
 
 public extension APIError {
+    @inlinable
     static func mount(from error: Swift.Error) -> APIError? {
         switch error {
         case let requestError as RequestError:
