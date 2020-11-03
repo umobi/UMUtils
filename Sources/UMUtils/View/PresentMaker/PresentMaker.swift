@@ -29,7 +29,7 @@ import UIKit
 public struct PresentMaker<Content> where Content: View {
     let presentingStyle: UIModalPresentationStyle
     let transitionStyle: UIModalTransitionStyle
-    let content: Content?
+    let content: Content
     let onCompletion: (() -> Void)?
     let animated: Bool
 
@@ -82,11 +82,15 @@ public struct PresentMaker<Content> where Content: View {
     }
 
     func viewController(onDismiss: @escaping () -> Void) -> UIViewController {
-        let viewController = UIHostingController(rootView: ZStack {
-            PresentedView(onDismiss: onDismiss)
-            self.content
-        })
+        let viewController = UIHostingController(
+            rootView:
+                self.content
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(PresentedView(onDismiss: onDismiss))
+                    .background(Color.clear)
+        )
 
+        viewController.view.backgroundColor = .clear
         viewController.modalPresentationStyle = self.presentingStyle
         viewController.modalTransitionStyle = self.transitionStyle
 

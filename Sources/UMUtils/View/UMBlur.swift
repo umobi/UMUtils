@@ -27,10 +27,14 @@ import SwiftUI
 import UIKit
 
 public struct UMBlur: UIViewRepresentable {
-    private let style: UIBlurEffect.Style
+    @Binding private var style: UIBlurEffect.Style
 
-    public init(style: UIBlurEffect.Style = .systemMaterial) {
-        self.style = style
+    public init(_ style: UIBlurEffect.Style = .systemMaterial) {
+        self._style = .constant(style)
+    }
+
+    public init(_ style: Binding<UIBlurEffect.Style>) {
+        self._style = style
     }
 
     public func makeUIView(context: Context) -> UIVisualEffectView {
@@ -41,24 +45,51 @@ public struct UMBlur: UIViewRepresentable {
         uiView.effect = UIBlurEffect(style: self.style)
     }
 }
+
+extension View {
+    @inline(__always)
+    func blur(_ style: UIBlurEffect.Style) -> some View {
+        self.background(UMBlur(style))
+    }
+
+    @inline(__always)
+    func blur(_ style: Binding<UIBlurEffect.Style>) -> some View {
+        self.background(UMBlur(style))
+    }
+}
+
+public extension UMBlur {
+    static var systemMaterial: UMBlur {
+        UMBlur(.systemMaterial)
+    }
+}
 #endif
 
 #if os(macOS)
 import AppKit
 
 public struct UMBlur: NSViewRepresentable {
-    private let material: NSVisualEffectView.Material
-    private let blendingMode: NSVisualEffectView.BlendingMode
+    @Binding private var material: NSVisualEffectView.Material
+    @Binding private var blendingMode: NSVisualEffectView.BlendingMode
 
-    public init(material: NSVisualEffectView.Material, blendingMode: NSVisualEffectView.BlendingMode) {
-        self.material = material
-        self.blendingMode = blendingMode
+    public init(
+        _ material: NSVisualEffectView.Material,
+        blendingMode: NSVisualEffectView.BlendingMode) {
+
+        self._material = .constant(material)
+        self._blendingMode = .constant(blendingMode)
+    }
+
+    public init(
+        _ material: Binding<NSVisualEffectView.Material>,
+        blendingMode: Binding<NSVisualEffectView.BlendingMode>) {
+
+        self._material = material
+        self._blendingMode = blendingMode
     }
 
     public func makeNSView(context: Context) -> NSVisualEffectView {
         let visualEffectView = NSVisualEffectView()
-        visualEffectView.material = self.material
-        visualEffectView.blendingMode = self.blendingMode
         visualEffectView.state = NSVisualEffectView.State.active
         return visualEffectView
     }
@@ -66,6 +97,28 @@ public struct UMBlur: NSViewRepresentable {
     public func updateNSView(_ visualEffectView: NSVisualEffectView, context: Context) {
         visualEffectView.material = self.material
         visualEffectView.blendingMode = self.blendingMode
+    }
+}
+
+extension View {
+    @inline(__always)
+    func blur(
+        _ material: NSVisualEffectView.Material,
+        blendingMode: NSVisualEffectView.BlendingMode) -> some View {
+        self.background(UMBlur(material, blendingMode: blendingMode))
+    }
+
+    @inline(__always)
+    func blur(
+        _ material: Binding<NSVisualEffectView.Material>,
+        blendingMode: Binding<NSVisualEffectView.BlendingMode>) -> some View {
+        self.background(UMBlur(material, blendingMode: blendingMode))
+    }
+}
+
+public extension UMBlur {
+    static var systemMaterial: UMBlur {
+        UMBlur(.appearanceBased, blendingMode: .withinWindow)
     }
 }
 

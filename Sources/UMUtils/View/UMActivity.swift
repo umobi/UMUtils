@@ -34,14 +34,16 @@ public struct UMActivity<Content>: View where Content: View {
     @State private var height: CGFloat = 0
 
     @Binding private var isAnimating: Bool
-    @Binding private var blurColor: Color
 
     #if os(iOS) || os(tvOS)
     @Binding private var style: UIActivityIndicatorView.Style
     @Binding private var color: Color
-    #elseif os(macOS)
+    @Binding private var blurStyle: UIBlurEffect.Style
+    #else
     @Binding private var style: NSControl.ControlSize
     @Binding var color: NSControlTint
+    @Binding private var blurMaterial: NSVisualEffectView.Material
+    @Binding private var blurBlendingMode: NSVisualEffectView.BlendingMode
     #endif
 
     private let contents: () -> Content
@@ -51,7 +53,7 @@ public struct UMActivity<Content>: View where Content: View {
 
     #if os(iOS) || os(tvOS)
     public init(
-        _ blurColor: Binding<Color>,
+        _ blurStyle: Binding<UIBlurEffect.Style>,
         style: Binding<UIActivityIndicatorView.Style> = .constant(.medium),
         color: Binding<Color>,
         size: Size = .medium,
@@ -59,7 +61,7 @@ public struct UMActivity<Content>: View where Content: View {
         isAnimating: Binding<Bool>,
         @ViewBuilder contents: @escaping () -> Content) {
 
-        self._blurColor = blurColor
+        self._blurStyle = blurStyle
         self._isAnimating = isAnimating
         self._color = color
         self._style = style
@@ -69,7 +71,8 @@ public struct UMActivity<Content>: View where Content: View {
     }
     #elseif os(macOS)
     public init(
-        _ blurColor: Binding<Color>,
+        _ blurMaterial: Binding<NSVisualEffectView.Material>,
+        blendingMode: Binding<NSVisualEffectView.BlendingMode> = .constant(.withinWindow),
         style: Binding<NSControl.ControlSize> = .constant(.regular),
         color: Binding<NSControlTint>,
         size: Size = .medium,
@@ -77,7 +80,8 @@ public struct UMActivity<Content>: View where Content: View {
         isAnimating: Binding<Bool>,
         @ViewBuilder contents: @escaping () -> Content) {
 
-        self._blurColor = blurColor
+        self._blurMaterial = blurMaterial
+        self._blurBlendingMode = blendingMode
         self._isAnimating = isAnimating
         self._color = color
         self._style = style
@@ -113,12 +117,7 @@ public struct UMActivity<Content>: View where Content: View {
                     .layoutPriority(2)
                 }
                 .padding(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/, 15)
-                .background(
-                    blurColor
-                        .opacity(0.15)
-                        .edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
-                        .blur(radius: 20)
-                )
+                .background(blurView)
                 .cornerRadius(7.5)
                 .shadow(
                     color: Color.black.opacity(0.15),
@@ -130,17 +129,31 @@ public struct UMActivity<Content>: View where Content: View {
     }
 }
 
+extension UMActivity {
+    #if os(iOS) || os(tvOS)
+    var blurView: some View {
+        UMBlur($blurStyle)
+            .edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
+    }
+    #elseif os(macOS)
+    var blurView: some View {
+        UMBlur($blurMaterial, blendingMode: $blurBlendingMode)
+            .edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
+    }
+    #endif
+}
+
 #if os(iOS) || os(tvOS)
 extension UMActivity where Content == Never {
     public init(
-        _ blurColor: Binding<Color>,
+        _ blurStyle: Binding<UIBlurEffect.Style>,
         style: Binding<UIActivityIndicatorView.Style> = .constant(.medium),
         color: Binding<Color>,
         size: Size = .medium,
         mode: Mode = .forever,
         isAnimating: Binding<Bool>) {
 
-        self._blurColor = blurColor
+        self._blurStyle = blurStyle
         self._isAnimating = isAnimating
         self._color = color
         self._style = style
@@ -152,14 +165,16 @@ extension UMActivity where Content == Never {
 #elseif os(macOS)
 extension UMActivity where Content == Never {
     public init(
-        _ blurColor: Binding<Color>,
+        _ blurMaterial: Binding<NSVisualEffectView.Material>,
+        blendingMode: Binding<NSVisualEffectView.BlendingMode> = .constant(.withinWindow),
         style: Binding<NSControl.ControlSize> = .constant(.regular),
         color: Binding<NSControlTint>,
         size: Size = .medium,
         mode: Mode = .forever,
         isAnimating: Binding<Bool>) {
 
-        self._blurColor = blurColor
+        self._blurMaterial = blurMaterial
+        self._blurBlendingMode = blendingMode
         self._isAnimating = isAnimating
         self._color = color
         self._style = style
@@ -203,7 +218,7 @@ public extension UMActivity {
 public extension View {
     @inlinable
     func activityIndicator<Content>(
-        _ blurColor: Binding<Color>,
+        _ blurStyle: Binding<UIBlurEffect.Style>,
         style: Binding<UIActivityIndicatorView.Style> = .constant(.medium),
         color: Binding<Color>,
         size: UMActivity<Content>.Size = .medium,
@@ -216,7 +231,7 @@ public extension View {
             self.frame(maxWidth: .infinity, maxHeight: .infinity)
 
             UMActivity(
-                blurColor,
+                blurStyle,
                 style: style,
                 color: color,
                 size: size,
@@ -229,7 +244,7 @@ public extension View {
 
     @inlinable
     func activityIndicator(
-        _ blurColor: Binding<Color>,
+        _ blurStyle: Binding<UIBlurEffect.Style>,
         style: Binding<UIActivityIndicatorView.Style> = .constant(.medium),
         color: Binding<Color>,
         size: UMActivity<Never>.Size = .medium,
@@ -241,7 +256,7 @@ public extension View {
             self.frame(maxWidth: .infinity, maxHeight: .infinity)
 
             UMActivity(
-                blurColor,
+                blurStyle,
                 style: style,
                 color: color,
                 size: size,

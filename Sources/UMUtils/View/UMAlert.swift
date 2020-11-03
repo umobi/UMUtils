@@ -56,10 +56,8 @@ public struct UMAlert<Title, Subtitle, Description, Button>: View where Title: V
                 .edgesIgnoringSafeArea(.all)
 
             ZStack {
-                Color.white
-                    .opacity(0.75)
+                UMBlur.systemMaterial
                     .edgesIgnoringSafeArea(.all)
-                    .blur(radius: 20)
 
                 VStack(spacing: 15) {
                     self.content {
@@ -240,7 +238,7 @@ public extension UMAlert {
 
         self.button {
             AnyView(
-                SwiftUI.Button(action: onTap) {
+                DismissButton(action: onTap) {
                     Text(title)
                         .foregroundColor(Color.white)
                         .font(.body)
@@ -262,7 +260,7 @@ public extension UMAlert {
 
         self.button {
             AnyView(
-                SwiftUI.Button(action: onTap) {
+                DismissButton(action: onTap) {
                     Text(title)
                         .foregroundColor(Color.red)
                         .font(.body)
@@ -274,7 +272,7 @@ public extension UMAlert {
                             Color.white
                                 .opacity(0.75)
                                 .edgesIgnoringSafeArea(.all)
-                                .blur(radius: 20)
+                                .background(UMBlur.systemMaterial)
                         )
                         .cornerRadius(5)
                 }
@@ -290,7 +288,7 @@ public extension UMAlert {
         self.button {
 
             AnyView(
-                SwiftUI.Button(action: onTap) {
+                DismissButton(action: onTap) {
                     Text(title)
                         .foregroundColor(Color.black)
                         .font(.body)
@@ -301,7 +299,7 @@ public extension UMAlert {
                             Color.white
                                 .opacity(0.75)
                                 .edgesIgnoringSafeArea(.all)
-                                .blur(radius: 20)
+                                .background(UMBlur.systemMaterial)
                         )
                         .cornerRadius(5)
                 }

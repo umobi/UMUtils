@@ -102,12 +102,24 @@ struct DefaultTransitionViewWrapper<Content>: UIViewRepresentable where Content:
         self.requestPresentation(uiView)
     }
 }
+#endif
 
+#if os(iOS) || os(tvOS)
 extension UIView {
     var viewController: UIViewController! {
         sequence(first: self as UIResponder, next: { $0.next })
             .first(where: { $0 is UIViewController })
             as? UIViewController
+    }
+}
+#elseif os(macOS)
+import AppKit
+
+extension NSView {
+    var viewController: NSViewController! {
+        sequence(first: self as NSResponder, next: { $0.nextResponder })
+            .first(where: { $0 is NSViewController })
+            as? NSViewController
     }
 }
 #endif
