@@ -28,7 +28,7 @@ public extension Request {
 
     @frozen
     enum PublisherLodingType {
-        case boolean(ActivityPublisher)
+        case boolean(BooleanIndicator)
     }
 
     @frozen
@@ -105,14 +105,14 @@ extension Request {
 
 public extension Request {
     @inline(__always) @inlinable 
-    func publisher<Object>(_ decodable: Object.Type, isLoading: ActivityPublisher = .init()) -> Request.Publisher<Object> where Object: Decodable {
+    func publisher<Object>(_ decodable: Object.Type, isLoading: BooleanIndicator = .init()) -> Request.Publisher<Object> where Object: Decodable {
         .init(self, .boolean(isLoading))
     }
 }
 
 public extension Request {
     @inlinable
-    func apiPublisher<APISuccess>(_ decodable: APISuccess.Type, isLoading: ActivityPublisher = .init()) -> AnyPublisher<APIResult<APISuccess>, Never> where APISuccess: APIRawObject {
+    func apiPublisher<APISuccess>(_ decodable: APISuccess.Type, isLoading: BooleanIndicator = .init()) -> AnyPublisher<APIResult<APISuccess>, Never> where APISuccess: APIRawObject {
         self.publisher(APISuccess.self, isLoading: isLoading)
             .map { .success($0) }
             .catch { result -> AnyPublisher<APIResult<APISuccess>, Never> in

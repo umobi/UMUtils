@@ -24,190 +24,104 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS)
 import UIKit
-#elseif os(macOS)
-import AppKit
-#endif
 
-#if os(iOS) || os(tvOS) || os(macOS)
-public struct ActivityView: View {
+public struct ActivityView: UIViewRepresentable {
+    @Binding var style: UIActivityIndicatorView.Style
+    @Binding var color: Color
 
-    #if os(iOS) || os(tvOS)
-    private let style: UIActivityIndicatorView.Style
-    private let color: UIColor
-    #elseif os(macOS)
-    private let size: NSControl.ControlSize
-    private let tint: NSControlTint
-    #endif
-
-    private let title: String?
-    private let titleColor: Color?
-    private let titleFont: Font?
-
-    #if os(iOS) || os(tvOS)
-    public init(style: UIActivityIndicatorView.Style) {
-        self.style = style
-        self.color = .black
-        self.title = nil
-        self.titleColor = nil
-        self.titleFont = nil
-    }
-    #elseif os(macOS)
-    public init(tint: NSControlTint) {
-        self.size = .regular
-        self.tint = tint
-        self.title = nil
-        self.titleColor = nil
-        self.titleFont = nil
-    }
-    #endif
-
-    private init(_ original: ActivityView, editable: Editable) {
-        #if os(iOS) || os(tvOS)
-        self.style = original.style
-        self.color = editable.color
-        #elseif os(macOS)
-        self.size = editable.size
-        self.tint = original.tint
-        #endif
-
-        self.title = editable.title
-        self.titleColor = editable.titleColor
-        self.titleFont = editable.titleFont
+    public init(_ style: Binding<UIActivityIndicatorView.Style>,_ color: Binding<Color>) {
+        self._style = style
+        self._color = color
     }
 
-    @State private var height: CGFloat = 0
+    public init(_ style: UIActivityIndicatorView.Style, _ color: Color) {
+        self._style = .constant(style)
+        self._color = .constant(color)
+    }
 
-    public var body: some View {
-        ZStack {
-            Color.black
-                .opacity(0.15)
-                .edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
+    public func makeUIView(context: Context) -> View {
+        View(style: self.style)
+    }
 
-            ZStack {
-                VStack(spacing: 7.5) {
-                    #if os(iOS) || os(tvOS)
-                    UMActivity(style: self.style)
-                        .color(self.color)
-                        .padding(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/, 15)
-                    #elseif os(macOS)
-                    UMActivity(size: self.size, tint: self.tint)
-                        .padding(.all, 15)
-                    #endif
-
-                    if let title = self.title {
-                        ScrollView {
-                            Text(title)
-                                .foregroundColor(self.titleColor ?? .black)
-                                .font(self.titleFont ?? .body)
-                                .multilineTextAlignment(.center)
-                                .frame(maxWidth: 150)
-                                .background(GeometryReader { geometry -> AnyView in
-                                    OperationQueue.main.addOperation {
-                                        self.height = geometry.size.height
-                                    }
-
-                                    return AnyView(Rectangle().fill(Color.clear))
-                                })
-                        }
-                        .frame(maxHeight: self.height)
-                    }
-                }
-                .layoutPriority(2)
-            }
-            .padding(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/, 15)
-            .background({ () -> UMBlur in
-                #if os(iOS) || os(tvOS)
-                return UMBlur()
-                #elseif os(macOS)
-                return UMBlur(material: .contentBackground, blendingMode: .withinWindow)
-                #endif
-            }())
-            .cornerRadius(7.5)
-            .shadow(
-                color: Color.black.opacity(0.15),
-                radius: 5,
-                x: 2, y: 3
-            )
+    public func updateUIView(_ uiView: View, context: Context) {
+        uiView.style = style
+        if #available(iOS 14, tvOS 14, *) {
+            uiView.color = .init(color)
+        } else {
+            uiView.color = .init(cgColor: color.cgColor!)
         }
-    }
-}
-
-extension ActivityView {
-    @usableFromInline
-    class Editable {
-        #if os(iOS) || os(tvOS)
-        @usableFromInline
-        var color: UIColor
-        #elseif os(macOS)
-        @usableFromInline
-        var size: NSControl.ControlSize
-        #endif
-        @usableFromInline
-        var title: String?
-
-        @usableFromInline
-        var titleColor: Color?
-
-        @usableFromInline
-        var titleFont: Font?
-
-        init(_ original: ActivityView) {
-            #if os(iOS) || os(tvOS)
-            self.color = original.color
-            #elseif os(macOS)
-            self.size = original.size
-            #endif
-
-            self.title = original.title
-            self.titleColor = original.titleColor
-            self.titleFont = original.titleFont
-        }
-    }
-
-    @inline(__always) @usableFromInline
-    func edit(_ edit: (Editable) -> Void) -> Self {
-        let editable = Editable(self)
-        edit(editable)
-        return .init(self, editable: editable)
     }
 }
 
 public extension ActivityView {
+    class View: UIActivityIndicatorView {
+        public override func didMoveToWindow() {
+            super.didMoveToWindow()
 
-    #if os(iOS) || os(tvOS)
-    @inlinable
-    func color(_ color: UIColor) -> Self {
-        self.edit {
-            $0.color = color
+            if self.window != nil && !self.isAnimating {
+                self.startAnimating()
+                return
+            }
+
+            self.stopAnimating()
         }
     }
-    #elseif os(macOS)
-    @inlinable
-    func size(_ size: NSControl.ControlSize) -> Self {
-        self.edit {
-            $0.size = size
-        }
-    }
-    #endif
+}
+#endif
 
-    @inlinable
-    func title(_ title: String) -> Self {
-        self.edit {
-            $0.title = title
-        }
+#if os(macOS)
+public struct ActivityView: NSViewRepresentable {
+
+    private let size: NSControl.ControlSize
+    private let tint: NSControlTint
+
+    public init(size: NSControl.ControlSize, tint: NSControlTint) {
+        self.size = size
+        self.tint = tint
     }
 
-    @inlinable
-    func titleColor(_ color: Color) -> Self {
-        self.edit {
-            $0.titleColor = color
-        }
+    public func makeNSView(context: Context) -> View {
+        return View()
     }
 
-    @inlinable
-    func titleFont(_ font: Font) -> Self {
-        self.edit {
-            $0.titleFont = font
+    public func updateNSView(_ progressIndicator: View, context: Context) {
+        progressIndicator.style = .spinning
+        progressIndicator.controlSize = self.size
+        progressIndicator.controlTint = self.tint
+    }
+}
+
+public extension ActivityView {
+    class View: NSProgressIndicator {
+        private(set) var isAnimating: Bool = false
+
+        public override func startAnimation(_ sender: Any?) {
+            super.startAnimation(sender)
+            self.isAnimating = true
+        }
+
+        public override func stopAnimation(_ sender: Any?) {
+            super.stopAnimation(sender)
+            self.isAnimating = false
+        }
+
+        public func startAnimating() {
+            self.startAnimation(self)
+        }
+
+        public func stopAnimating() {
+            self.stopAnimation(self)
+        }
+
+        public override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+
+            if self.window != nil && !self.isAnimating {
+                self.startAnimating()
+                return
+            }
+
+            self.stopAnimating()
         }
     }
 }

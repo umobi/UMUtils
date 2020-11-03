@@ -24,120 +24,205 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS)
 import UIKit
+#elseif os(macOS)
+import AppKit
+#endif
 
-public struct UMActivity: UIViewRepresentable {
-    private let style: UIActivityIndicatorView.Style
-    private let color: UIColor
+#if os(iOS) || os(tvOS) || os(macOS)
+public struct UMActivity<Content>: View where Content: View {
+    @Mutable private var timer: Timer? = nil
+    @State private var height: CGFloat = 0
 
-    public init(style: UIActivityIndicatorView.Style) {
-        self.style = style
-        self.color = .black
+    @Binding private var isAnimating: Bool
+    @Binding private var blurColor: Color
+    @Binding private var color: Color
+    @Binding private var style: UIActivityIndicatorView.Style
+
+    private let contents: () -> Content
+
+    private let mode: Mode
+    private let size: Size
+
+    #if os(iOS) || os(tvOS)
+
+    public init(
+        _ blurColor: Binding<Color>,
+        style: Binding<UIActivityIndicatorView.Style> = .constant(.medium),
+        color: Binding<Color>,
+        size: Size = .medium,
+        mode: Mode = .forever,
+        isAnimating: Binding<Bool>,
+        @ViewBuilder contents: @escaping () -> Content) {
+
+        self._blurColor = blurColor
+        self._isAnimating = isAnimating
+        self._color = color
+        self._style = style
+        self.size = size
+        self.mode = mode
+        self.contents = contents
     }
-
-    private init(_ original: UMActivity, editable: Editable) {
-        self.style = original.style
-        self.color = editable.color
+    #elseif os(macOS)
+    public init(tint: NSControlTint) {
+        self.size = .regular
+        self.tint = tint
+        self.title = nil
+        self.titleColor = nil
+        self.titleFont = nil
     }
+    #endif
 
-    private class Editable {
-        var color: UIColor
+    @ViewBuilder
+    public var body: some View {
+        if isAnimating {
+            ZStack {
+                blurColor
+                    .opacity(0.15)
+                    .edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
+                    .blur(radius: 20)
 
-        init(_ original: UMActivity) {
-            self.color = original.color
+                ZStack {
+                    VStack(spacing: 7.5) {
+                        #if os(iOS) || os(tvOS)
+                        ActivityView(style, color)
+                            .padding(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/, 15)
+                        #elseif os(macOS)
+                        UMActivity(size: self.size, tint: self.tint)
+                            .padding(.all, 15)
+                        #endif
+
+                        if !(Content.self is Never.Type) {
+                            ScrollView {
+                                contents()
+                                    .background(GeometryReader { geometry -> AnyView in
+                                        OperationQueue.main.addOperation {
+                                            self.height = geometry.size.height
+                                        }
+
+                                        return AnyView(Rectangle().fill(Color.clear))
+                                    })
+                            }
+                            .frame(maxHeight: self.height)
+                        }
+                    }
+                    .layoutPriority(2)
+                }
+                .padding(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/, 15)
+                .background({ () -> UMBlur in
+                    #if os(iOS) || os(tvOS)
+                    return UMBlur()
+                    #elseif os(macOS)
+                    return UMBlur(material: .contentBackground, blendingMode: .withinWindow)
+                    #endif
+                }())
+                .cornerRadius(7.5)
+                .shadow(
+                    color: Color.black.opacity(0.15),
+                    radius: 5,
+                    x: 2, y: 3
+                )
+            }
         }
     }
+}
 
-    private func edit(_ edit: @escaping (Editable) -> Void) -> Self {
-        let editable = Editable(self)
-        edit(editable)
-        return .init(self, editable: editable)
-    }
+extension UMActivity where Content == Never {
+    public init(
+        _ blurColor: Binding<Color>,
+        style: Binding<UIActivityIndicatorView.Style> = .constant(.medium),
+        color: Binding<Color>,
+        size: Size = .medium,
+        mode: Mode = .forever,
+        isAnimating: Binding<Bool>) {
 
-    public func color(_ color: UIColor) -> Self {
-        self.edit {
-            $0.color = color
-        }
-    }
-
-    public func makeUIView(context: Context) -> View {
-        return View(style: self.style)
-    }
-
-    public func updateUIView(_ uiView: View, context: Context) {
-        uiView.style = self.style
-        uiView.color = self.color
+        self._blurColor = blurColor
+        self._isAnimating = isAnimating
+        self._color = color
+        self._style = style
+        self.size = size
+        self.mode = mode
+        self.contents = { fatalError() }
     }
 }
 
 public extension UMActivity {
-    class View: UIActivityIndicatorView {
-        public override func didMoveToWindow() {
-            super.didMoveToWindow()
+    @frozen
+    enum Size {
+        case small
+        case medium
+        case large
 
-            if self.window != nil && !self.isAnimating {
-                self.startAnimating()
-                return
+        fileprivate var factor: CGFloat {
+            switch self {
+            case .small:
+                return 1
+            case .medium:
+                return 1.5
+            case .large:
+                return 2
             }
-
-            self.stopAnimating()
         }
+    }
+}
+
+public extension UMActivity {
+    @frozen
+    enum Mode {
+        case forever
+        case until(TimeInterval)
     }
 }
 #endif
 
-#if os(macOS)
-public struct UMActivity: NSViewRepresentable {
+#if os(iOS) || os(tvOS)
+public extension View {
+    @inlinable
+    func activityIndicator<Content>(
+        _ blurColor: Binding<Color>,
+        style: Binding<UIActivityIndicatorView.Style> = .constant(.medium),
+        color: Binding<Color>,
+        size: UMActivity<Content>.Size = .medium,
+        mode: UMActivity<Content>.Mode = .forever,
+        isAnimating: Binding<Bool>,
+        @ViewBuilder contents: @escaping () -> Content
+    ) -> some View where Content: View {
 
-    private let size: NSControl.ControlSize
-    private let tint: NSControlTint
+        ZStack {
+            self.frame(maxWidth: .infinity, maxHeight: .infinity)
 
-    public init(size: NSControl.ControlSize, tint: NSControlTint) {
-        self.size = size
-        self.tint = tint
+            UMActivity(
+                blurColor,
+                style: style,
+                color: color,
+                size: size,
+                mode: mode,
+                isAnimating: isAnimating,
+                contents: contents
+            )
+        }
     }
 
-    public func makeNSView(context: Context) -> View {
-        return View()
-    }
+    @inlinable
+    func activityIndicator(
+        _ blurColor: Binding<Color>,
+        style: Binding<UIActivityIndicatorView.Style> = .constant(.medium),
+        color: Binding<Color>,
+        size: UMActivity<Never>.Size = .medium,
+        mode: UMActivity<Never>.Mode = .forever,
+        isAnimating: Binding<Bool>
+    ) -> some View {
 
-    public func updateNSView(_ progressIndicator: View, context: Context) {
-        progressIndicator.style = .spinning
-        progressIndicator.controlSize = self.size
-        progressIndicator.controlTint = self.tint
-    }
-}
+        ZStack {
+            self.frame(maxWidth: .infinity, maxHeight: .infinity)
 
-public extension UMActivity {
-    class View: NSProgressIndicator {
-        private(set) var isAnimating: Bool = false
-
-        public override func startAnimation(_ sender: Any?) {
-            super.startAnimation(sender)
-            self.isAnimating = true
-        }
-
-        public override func stopAnimation(_ sender: Any?) {
-            super.stopAnimation(sender)
-            self.isAnimating = false
-        }
-
-        public func startAnimating() {
-            self.startAnimation(self)
-        }
-
-        public func stopAnimating() {
-            self.stopAnimation(self)
-        }
-
-        public override func viewDidMoveToWindow() {
-            super.viewDidMoveToWindow()
-
-            if self.window != nil && !self.isAnimating {
-                self.startAnimating()
-                return
-            }
-
-            self.stopAnimating()
+            UMActivity(
+                blurColor,
+                style: style,
+                color: color,
+                size: size,
+                mode: mode,
+                isAnimating: isAnimating
+            )
         }
     }
 }

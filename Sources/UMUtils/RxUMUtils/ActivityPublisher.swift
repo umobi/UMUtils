@@ -22,44 +22,56 @@
 
 import Foundation
 import Combine
+import SwiftUI
 
 @inline(__always) @inlinable
 public func positiveOrZero<Number>(_ x: Number) -> Number where Number: Numeric & Comparable {
     x <= 0 ? 0 : x
 }
 
-@frozen
-public struct ActivityPublisher: Publisher {
+@propertyWrapper
+public struct BooleanIndicator: Publisher, DynamicProperty {
     public typealias Output = Bool
     public typealias Failure = Never
 
-    private let subject = CurrentValueSubject<Int, Never>(0)
+    @Mutable var subject: Int = .zero
 
     @inlinable
     public init() {}
 
     public func receive<S>(subscriber: S) where S : Subscriber, Self.Failure == S.Failure, Self.Output == S.Input {
-        subscriber.receive(subscription: Subscription(subscriber, self.subject))
+        subscriber.receive(subscription: Subscription(subscriber, self._subject.publisher))
+    }
+
+    public var wrappedValue: Bool {
+        self.subject != .zero
+    }
+
+    public var projectedValue: Binding<Bool> {
+        Binding(
+            get: { wrappedValue },
+            set: { _ in fatalError() }
+        )
     }
 
     @inline(__always)
     func increment() {
-        self.subject.value += 1
+        self.subject += 1
     }
 
     @inline(__always)
     func decrement() {
-        self.subject.value = positiveOrZero(self.subject.value - 1)
+        self.subject = positiveOrZero(self.subject - 1)
     }
 }
 
-extension ActivityPublisher {
+extension BooleanIndicator {
     class Subscription<SubscriberType: Subscriber>: Combine.Subscription where SubscriberType.Input == Bool, SubscriberType.Failure == Never {
 
         private(set) var subscriber: SubscriberType?
         private var cancellations: [AnyCancellable] = []
 
-        init(_ subscriber: SubscriberType,_ value: CurrentValueSubject<Int, Never>) {
+        init(_ subscriber: SubscriberType,_ value: AnyPublisher<Int, Never>) {
             self.subscriber = subscriber
 
             value.sink(receiveValue: { [weak self] in
@@ -77,14 +89,3 @@ extension ActivityPublisher {
         }
     }
 }
-
-#if os(iOS) || os(tvOS)
-import UIKit
-
-public extension ActivityPublisher {
-    @inline(__always) @inlinable
-    static func booleanState(_ style: UIActivityIndicatorView.Style) -> ActivityPublisher {
-        APIBooleanLoadingState.shared(style).activityPublisher
-    }
-}
-#endif

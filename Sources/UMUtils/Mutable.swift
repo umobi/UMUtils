@@ -22,27 +22,40 @@
 
 import Foundation
 import SwiftUI
+import Combine
 
 @propertyWrapper @frozen
-public struct MaskedText: DynamicProperty {
-    @Mutable var string: String
-    private let mask: MaskType
+public struct Mutable<Value>: DynamicProperty {
+    @usableFromInline
+    class Box: ObservableObject {
+        @Published var value: Value
 
-    public init(wrappedValue value: String,_ mask: MaskType) {
-        self.mask = mask
-        self._string = .init(wrappedValue: value)
+        init(value: Value) {
+          self.value = value
+        }
     }
 
-    public var wrappedValue: String {
-        get { self.string }
+    @ObservedObject private var _box: Box
+
+    public init(wrappedValue: Value) {
+        self._box = .init(value: wrappedValue)
+    }
+
+    public var wrappedValue: Value {
+        get { self._box.value }
         nonmutating
-        set { self.string = newValue.mask(self.mask) }
+        set { self._box.value = newValue}
     }
 
-    public var projectedValue: Binding<String> {
+    public var projectedValue: Binding<Value> {
         .init(
             get: { wrappedValue },
             set: { wrappedValue = $0 }
         )
+    }
+
+    public var publisher: AnyPublisher<Value, Never> {
+        self._box.$value
+            .eraseToAnyPublisher()
     }
 }
