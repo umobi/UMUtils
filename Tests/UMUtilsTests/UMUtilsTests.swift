@@ -6,7 +6,7 @@ import Request
 final class UMUtilsTests: XCTestCase {
     var cancellations: [AnyCancellable] = []
 
-    let isLoading: ActivityPublisher = .init()
+    @BooleanIndicator var isLoading
 
     func testExample() {
         // This is an example of a functional test case.
@@ -14,7 +14,7 @@ final class UMUtilsTests: XCTestCase {
         // results.
         let expectation = XCTestExpectation(description: "Download apple.com home page")
 
-        isLoading.sink(receiveValue: {
+        _isLoading.sink(receiveValue: {
             Swift.print("isLoading: \($0)")
         })
         .store(in: &self.cancellations)
@@ -26,7 +26,7 @@ final class UMUtilsTests: XCTestCase {
             Method(.get)
             Header.ContentType(.json)
         }
-        .apiPublisher(APIObject<Config>.self, isLoading: self.isLoading)
+        .apiPublisher(APIObject<Config>.self, isLoading: _isLoading)
         .retryOnConnect(timeout: .forever)
         .sink {
             print("Result", $0)

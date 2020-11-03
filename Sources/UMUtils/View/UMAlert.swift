@@ -28,28 +28,25 @@ import AppKit
 #endif
 
 #if os(iOS) || os(tvOS) || os(macOS)
-public struct UMAlert: View {
+public struct UMAlert<Title, Subtitle, Description, Button>: View where Title: View, Subtitle: View, Description: View, Button: View {
 
-    private let titles: [AnyView]
-    private let subtitles: [AnyView]
-    private let descriptions: [AnyView]
-    private let buttons: [AnyView]
+    private let titles: () -> Title
+    private let subtitles: () -> Subtitle
+    private let descriptions: () -> Description
+    private let buttons: () -> Button
 
     @State private var contentHeight: CGFloat = 0
 
-    public init() {
-        self.titles = []
-        self.subtitles = []
-        self.descriptions = []
-        self.buttons = []
-    }
+    init(
+        @ViewBuilder titles: @escaping () -> Title,
+        @ViewBuilder subtitles: @escaping () -> Subtitle,
+        @ViewBuilder descriptions: @escaping () -> Description,
+        @ViewBuilder buttons: @escaping () -> Button) {
 
-    private init(_ original: UMAlert, editable: Editable) {
-        self._contentHeight = original._contentHeight
-        self.titles = editable.titles
-        self.subtitles = editable.subtitles
-        self.descriptions = editable.descriptions
-        self.buttons = editable.buttons
+        self.titles = titles
+        self.subtitles = subtitles
+        self.descriptions = descriptions
+        self.buttons = buttons
     }
 
     public var body: some View {
@@ -59,47 +56,43 @@ public struct UMAlert: View {
                 .edgesIgnoringSafeArea(.all)
 
             ZStack {
-                #if os(iOS) || os(tvOS)
-                UMBlur(style: .extraLight)
-                #elseif os(macOS)
-                UMBlur(material: .contentBackground, blendingMode: .withinWindow)
-                #endif
+                Color.white
+                    .opacity(0.75)
+                    .edgesIgnoringSafeArea(.all)
+                    .blur(radius: 20)
 
                 VStack(spacing: 15) {
                     self.content {
                         VStack(spacing: 7.5) {
-                            if !self.titles.isEmpty {
+                            if !(Title.self is Never.Type) {
                                 VStack(spacing: 3.75) {
-                                    ForEach(Array(self.titles.enumerated()), id: \.offset) {
-                                        $0.1
-                                    }
-                                }.frame(maxWidth: .infinity)
+                                    titles()
+                                }
+                                .frame(maxWidth: .infinity)
                             }
 
-                            if !self.subtitles.isEmpty {
+                            if !(Subtitle.self is Never.Type) {
                                 VStack(spacing: 3.75) {
-                                    ForEach(Array(self.subtitles.enumerated()), id: \.offset) {
-                                        $0.1
-                                    }
-                                }.frame(maxWidth: .infinity)
+                                    subtitles()
+                                }
+                                .frame(maxWidth: .infinity)
                             }
 
-                            if !self.descriptions.isEmpty {
+                            if !(Description.self is Never.Type) {
                                 VStack(spacing: 3.75) {
-                                    ForEach(Array(self.descriptions.enumerated()), id: \.offset) {
-                                        $0.1
-                                    }
-                                }.frame(maxWidth: .infinity)
+                                    descriptions()
+                                }
+                                .frame(maxWidth: .infinity)
                             }
                         }
                     }
 
-                    if !self.buttons.isEmpty {
+                    if !(Button.self is Never.Type) {
                         VStack(spacing: 7.5) {
-                            ForEach(Array(self.buttons.enumerated()), id: \.offset) {
-                                $0.1.frame(maxWidth: .infinity)
-                            }
+                            buttons()
+                                .frame(maxWidth: .infinity)
                         }
+                        .frame(maxWidth: .infinity)
                     }
                 }
                 .padding(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/, 15)
@@ -111,164 +104,208 @@ public struct UMAlert: View {
     }
 }
 
+extension UMAlert where Title == Never, Subtitle == Never, Description == Never, Button == Never {
+    public init() {
+        self.titles = { fatalError() }
+        self.subtitles = { fatalError() }
+        self.descriptions = { fatalError() }
+        self.buttons = { fatalError() }
+    }
+}
+
+public extension UMAlert {
+    func title<Content>(@ViewBuilder content: @escaping () -> Content) -> UMAlert<TupleView<(Title?, Content)>, Subtitle, Description, Button> where Content: View {
+        .init(titles: {
+            if !(Title.self is Never.Type) {
+                titles()
+            }
+
+            content()
+        }, subtitles: subtitles, descriptions: descriptions, buttons: buttons)
+    }
+}
+
+public extension UMAlert {
+    func subtitle<Content>(@ViewBuilder content: @escaping () -> Content) -> UMAlert<Title, TupleView<(Subtitle?, Content)>, Description, Button> where Content: View {
+        .init(titles: titles, subtitles: {
+            if !(Subtitle.self is Never.Type) {
+                subtitles()
+            }
+
+            content()
+        }, descriptions: descriptions, buttons: buttons)
+    }
+}
+
+public extension UMAlert {
+    func description<Content>(@ViewBuilder content: @escaping () -> Content) -> UMAlert<Title, Subtitle, TupleView<(Description?, Content)>, Button> where Content: View {
+        .init(titles: titles, subtitles: subtitles, descriptions: {
+            if !(Description.self is Never.Type) {
+                descriptions()
+            }
+
+            content()
+        }, buttons: buttons)
+    }
+}
+
+public extension UMAlert {
+    func button<Content>(@ViewBuilder content: @escaping () -> Content) -> UMAlert<Title, Subtitle, Description, TupleView<(Button?, Content)>> where Content: View {
+        .init(titles: titles, subtitles: subtitles, descriptions: descriptions, buttons: {
+            if !(Button.self is Never.Type) {
+                buttons()
+            }
+
+            content()
+        })
+    }
+}
+
 private extension UMAlert {
     private func content<Content: View>(_ content: @escaping () -> Content) -> AnyView {
-        guard [self.titles, self.descriptions,  self.subtitles].contains(where: { !$0.isEmpty }) else {
+        guard [Title.self is Never.Type, Description.self is Never.Type, Subtitle.self is Never.Type].contains(where: { !$0 }) else {
             return AnyView(content())
         }
 
-        return AnyView(
-            ScrollView {
-                content()
-                    .background(GeometryReader { geometry -> AnyView in
-                        OperationQueue.main.addOperation {
-                            self.contentHeight = geometry.size.height
-                        }
+        return AnyView(ScrollView {
+            content()
+                .background(GeometryReader { geometry -> AnyView in
+                    OperationQueue.main.addOperation {
+                        self.contentHeight = geometry.size.height
+                    }
 
-                        return AnyView(Rectangle().fill(Color.clear))
-                    })
-            }
-            .frame(maxHeight: self.contentHeight)
-        )
-    }
-}
-
-private extension UMAlert {
-
-    class Editable {
-        var titles: [AnyView]
-        var subtitles: [AnyView]
-        var descriptions: [AnyView]
-        var buttons: [AnyView]
-
-        init(_ original: UMAlert) {
-            self.titles = original.titles
-            self.subtitles = original.subtitles
-            self.descriptions = original.descriptions
-            self.buttons = original.buttons
+                    return AnyView(Rectangle().fill(Color.clear))
+                })
         }
-    }
-
-    func edit(_ edit: @escaping (Editable) -> Void) -> Self {
-        let editable = Editable(self)
-        edit(editable)
-        return .init(self, editable: editable)
+        .frame(maxHeight: self.contentHeight))
     }
 }
 
 public extension UMAlert {
+    func title<TitleString>(
+        _ title: TitleString,
+        color: Color = .black,
+        font: Font = .title
+    ) -> UMAlert<TupleView<(Title?, AnyView)>, Subtitle, Description, Button> where TitleString: StringProtocol {
 
-    func addButton<Content: View>(_ content: @escaping () -> Content) -> Self {
-        self.edit {
-            $0.buttons = $0.buttons + [AnyView(content())]
-        }
-    }
-
-    func addTitle<Content: View>(_ content: @escaping () -> Content) -> Self {
-        self.edit {
-            $0.titles = $0.titles + [AnyView(content())]
-        }
-    }
-
-    func addSubtitle<Content: View>(_ content: @escaping () -> Content) -> Self {
-        self.edit {
-            $0.subtitles = $0.subtitles + [AnyView(content())]
-        }
-    }
-
-    func addDescription<Content: View>(_ content: @escaping () -> Content) -> Self {
-        self.edit {
-            $0.descriptions = $0.descriptions + [AnyView(content())]
-        }
-    }
-}
-
-public extension UMAlert {
-    func title<Title>(_ title: Title, color: Color = .black, font: Font = .title) -> Self where Title: StringProtocol {
-        self.addTitle {
-            Text(title)
-                .foregroundColor(color)
-                .font(font)
-                .multilineTextAlignment(.center)
-        }
-    }
-
-    func subtitle<Subtitle>(_ subtitle: Subtitle, color: Color = .gray, font: Font = .callout) -> Self where Subtitle: StringProtocol {
-        self.addSubtitle {
-            Text(subtitle)
-                .foregroundColor(color)
-                .font(font)
-                .multilineTextAlignment(.center)
-        }
-    }
-
-    func description<Description>(_ description: Description, color: Color = .black, font: Font = .callout) -> Self where Description: StringProtocol {
-            self.addDescription {
-                Text(description)
+        self.title {
+            AnyView(
+                Text(title)
                     .foregroundColor(color)
                     .font(font)
                     .multilineTextAlignment(.center)
+            )
+        }
+    }
+
+    func subtitle<SubtitleString>(
+        _ subtitle: SubtitleString,
+        color: Color = .gray,
+        font: Font = .callout
+    ) -> UMAlert<Title, TupleView<(Subtitle?, AnyView)>, Description, Button> where SubtitleString: StringProtocol {
+
+        self.subtitle {
+            AnyView(
+                Text(subtitle)
+                    .foregroundColor(color)
+                    .font(font)
+                    .multilineTextAlignment(.center)
+            )
+        }
+    }
+
+    func description<DescriptionString>(
+        _ description: DescriptionString,
+        color: Color = .black,
+        font: Font = .callout
+    ) -> UMAlert<Title, Subtitle, TupleView<(Description?, AnyView)>, Button> where DescriptionString: StringProtocol {
+
+            self.description {
+                AnyView(
+                    Text(description)
+                        .foregroundColor(color)
+                        .font(font)
+                        .multilineTextAlignment(.center)
+                )
             }
     }
 }
 
 public extension UMAlert {
-    func cancelButton<Title>(title: Title, tintColor: Color = .blue, onTap: @escaping () -> Void) -> Self where Title: StringProtocol {
-        self.addButton {
-            Button(action: onTap) {
-                Text(title)
-                    .foregroundColor(Color.white)
-                    .font(.body)
-                    .bold()
-                    .multilineTextAlignment(.center)
-                    .padding(.all, 15)
-                    .frame(maxWidth: .infinity)
-                    .background(tintColor)
-                    .cornerRadius(5)
-            }
+    func cancelButton<String>(
+        title: String,
+        tintColor: Color = .blue,
+        onTap: @escaping () -> Void
+    ) -> UMAlert<Title, Subtitle, Description, TupleView<(Button?, AnyView)>> where String: StringProtocol {
+
+        self.button {
+            AnyView(
+                SwiftUI.Button(action: onTap) {
+                    Text(title)
+                        .foregroundColor(Color.white)
+                        .font(.body)
+                        .bold()
+                        .multilineTextAlignment(.center)
+                        .padding(.all, 15)
+                        .frame(maxWidth: .infinity)
+                        .background(tintColor)
+                        .cornerRadius(5)
+                }
+            )
         }
     }
 
-    func destructiveButton<Title>(title: Title, onTap: @escaping () -> Void) -> Self where Title: StringProtocol {
-        self.addButton {
-            Button(action: onTap) {
-                Text(title)
-                    .foregroundColor(Color.red)
-                    .font(.body)
-                    .bold()
-                    .multilineTextAlignment(.center)
-                    .padding(.all, 15)
-                    .frame(maxWidth: .infinity)
-                    .background({ () -> UMBlur in
-                        #if os(iOS) || os(tvOS)
-                        return UMBlur(style: .extraLight)
-                        #elseif os(macOS)
-                        return UMBlur(material: .selection, blendingMode: .withinWindow)
-                        #endif
-                    }())
-                    .cornerRadius(5)
-            }
+    func destructiveButton<String>(
+        title: String,
+        onTap: @escaping () -> Void
+    ) -> UMAlert<Title, Subtitle, Description, TupleView<(Button?, AnyView)>> where String: StringProtocol {
+
+        self.button {
+            AnyView(
+                SwiftUI.Button(action: onTap) {
+                    Text(title)
+                        .foregroundColor(Color.red)
+                        .font(.body)
+                        .bold()
+                        .multilineTextAlignment(.center)
+                        .padding(.all, 15)
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            Color.white
+                                .opacity(0.75)
+                                .edgesIgnoringSafeArea(.all)
+                                .blur(radius: 20)
+                        )
+                        .cornerRadius(5)
+                }
+            )
         }
     }
 
-    func otherButton<Title>(title: Title, onTap: @escaping () -> Void) -> Self where Title: StringProtocol {
-        self.addButton {
-            Button(action: onTap) {
-                Text(title)
-                    .foregroundColor(Color.black)
-                    .font(.body)
-                    .multilineTextAlignment(.center)
-                    .padding(.all, 15)
-                    .frame(maxWidth: .infinity)
-                    .background({ () -> UMBlur in
-                        #if os(iOS) || os(tvOS)
-                        return UMBlur(style: .extraLight)
-                        #elseif os(macOS)
-                        return UMBlur(material: .selection, blendingMode: .withinWindow)
-                        #endif
-                    }())
-                    .cornerRadius(5)
-            }
+    func otherButton<String>(
+        title: String,
+        onTap: @escaping () -> Void
+    ) -> UMAlert<Title, Subtitle, Description, TupleView<(Button?, AnyView)>> where String: StringProtocol {
+
+        self.button {
+
+            AnyView(
+                SwiftUI.Button(action: onTap) {
+                    Text(title)
+                        .foregroundColor(Color.black)
+                        .font(.body)
+                        .multilineTextAlignment(.center)
+                        .padding(.all, 15)
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            Color.white
+                                .opacity(0.75)
+                                .edgesIgnoringSafeArea(.all)
+                                .blur(radius: 20)
+                        )
+                        .cornerRadius(5)
+                }
+            )
         }
     }
 }

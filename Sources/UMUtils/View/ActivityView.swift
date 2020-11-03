@@ -72,12 +72,17 @@ public extension ActivityView {
 #if os(macOS)
 public struct ActivityView: NSViewRepresentable {
 
-    private let size: NSControl.ControlSize
-    private let tint: NSControlTint
+    @Binding var size: NSControl.ControlSize
+    @Binding var tint: NSControlTint
 
-    public init(size: NSControl.ControlSize, tint: NSControlTint) {
-        self.size = size
-        self.tint = tint
+    public init(_ size: Binding<NSControl.ControlSize>, _ tint: Binding<NSControlTint>) {
+        self._size = size
+        self._tint = tint
+    }
+
+    public init(_ style: NSControl.ControlSize, _ color: NSControlTint) {
+        self._size = .constant(style)
+        self._tint = .constant(color)
     }
 
     public func makeNSView(context: Context) -> View {
@@ -86,8 +91,8 @@ public struct ActivityView: NSViewRepresentable {
 
     public func updateNSView(_ progressIndicator: View, context: Context) {
         progressIndicator.style = .spinning
-        progressIndicator.controlSize = self.size
-        progressIndicator.controlTint = self.tint
+        progressIndicator.controlSize = size
+        progressIndicator.controlTint = tint
     }
 }
 

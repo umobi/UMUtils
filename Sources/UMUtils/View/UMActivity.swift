@@ -35,8 +35,14 @@ public struct UMActivity<Content>: View where Content: View {
 
     @Binding private var isAnimating: Bool
     @Binding private var blurColor: Color
-    @Binding private var color: Color
+
+    #if os(iOS) || os(tvOS)
     @Binding private var style: UIActivityIndicatorView.Style
+    @Binding private var color: Color
+    #elseif os(macOS)
+    @Binding private var style: NSControl.ControlSize
+    @Binding var color: NSControlTint
+    #endif
 
     private let contents: () -> Content
 
@@ -44,7 +50,6 @@ public struct UMActivity<Content>: View where Content: View {
     private let size: Size
 
     #if os(iOS) || os(tvOS)
-
     public init(
         _ blurColor: Binding<Color>,
         style: Binding<UIActivityIndicatorView.Style> = .constant(.medium),
@@ -63,12 +68,22 @@ public struct UMActivity<Content>: View where Content: View {
         self.contents = contents
     }
     #elseif os(macOS)
-    public init(tint: NSControlTint) {
-        self.size = .regular
-        self.tint = tint
-        self.title = nil
-        self.titleColor = nil
-        self.titleFont = nil
+    public init(
+        _ blurColor: Binding<Color>,
+        style: Binding<NSControl.ControlSize> = .constant(.regular),
+        color: Binding<NSControlTint>,
+        size: Size = .medium,
+        mode: Mode = .forever,
+        isAnimating: Binding<Bool>,
+        @ViewBuilder contents: @escaping () -> Content) {
+
+        self._blurColor = blurColor
+        self._isAnimating = isAnimating
+        self._color = color
+        self._style = style
+        self.size = size
+        self.mode = mode
+        self.contents = contents
     }
     #endif
 
@@ -76,20 +91,10 @@ public struct UMActivity<Content>: View where Content: View {
     public var body: some View {
         if isAnimating {
             ZStack {
-                blurColor
-                    .opacity(0.15)
-                    .edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
-                    .blur(radius: 20)
-
                 ZStack {
                     VStack(spacing: 7.5) {
-                        #if os(iOS) || os(tvOS)
-                        ActivityView(style, color)
+                        ActivityView($style, $color)
                             .padding(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/, 15)
-                        #elseif os(macOS)
-                        UMActivity(size: self.size, tint: self.tint)
-                            .padding(.all, 15)
-                        #endif
 
                         if !(Content.self is Never.Type) {
                             ScrollView {
@@ -108,13 +113,12 @@ public struct UMActivity<Content>: View where Content: View {
                     .layoutPriority(2)
                 }
                 .padding(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/, 15)
-                .background({ () -> UMBlur in
-                    #if os(iOS) || os(tvOS)
-                    return UMBlur()
-                    #elseif os(macOS)
-                    return UMBlur(material: .contentBackground, blendingMode: .withinWindow)
-                    #endif
-                }())
+                .background(
+                    blurColor
+                        .opacity(0.15)
+                        .edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
+                        .blur(radius: 20)
+                )
                 .cornerRadius(7.5)
                 .shadow(
                     color: Color.black.opacity(0.15),
@@ -126,6 +130,7 @@ public struct UMActivity<Content>: View where Content: View {
     }
 }
 
+#if os(iOS) || os(tvOS)
 extension UMActivity where Content == Never {
     public init(
         _ blurColor: Binding<Color>,
@@ -144,6 +149,26 @@ extension UMActivity where Content == Never {
         self.contents = { fatalError() }
     }
 }
+#elseif os(macOS)
+extension UMActivity where Content == Never {
+    public init(
+        _ blurColor: Binding<Color>,
+        style: Binding<NSControl.ControlSize> = .constant(.regular),
+        color: Binding<NSControlTint>,
+        size: Size = .medium,
+        mode: Mode = .forever,
+        isAnimating: Binding<Bool>) {
+
+        self._blurColor = blurColor
+        self._isAnimating = isAnimating
+        self._color = color
+        self._style = style
+        self.size = size
+        self.mode = mode
+        self.contents = { fatalError() }
+    }
+}
+#endif
 
 public extension UMActivity {
     @frozen

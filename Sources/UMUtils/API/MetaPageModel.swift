@@ -67,7 +67,7 @@ public extension Page {
     // MARK: Paged
     func appendRows(_ rows: [Element.Index], newPage: MetaPage, oldPage: MetaPage? = nil, map: ((Element) -> Element)? = nil) {
         let startIndex = newPage.startIndex - 1
-        let appendRows = Element.map(rows, startingAt: .init(row: startIndex, section: 0)).map {
+        let appendRows = Element.map(rows, startingAt: .init(item: startIndex, section: 0)).map {
             map?($0) ?? $0
         }
 
@@ -121,7 +121,7 @@ public extension Page {
 
 public extension Page {
     func reloadPage(where item: Element) {
-        let possiblePage = ((item.indexPath.row / self.page.value.count) + self.page.value.firstPage) - 1
+        let possiblePage = ((item.indexPath.item / self.page.value.count) + self.page.value.firstPage) - 1
         self.refreshPageRelay.send(self.page.value.reload(currentPage: possiblePage))
     }
 }
