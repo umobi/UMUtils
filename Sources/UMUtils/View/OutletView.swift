@@ -106,33 +106,31 @@ struct OutletView<Object>: NSViewRepresentable where Object: NSView {
         self._object = outlet
     }
 
-    func makeNSView(context: Context) -> some NSView {
-        View {
+    func makeNSView(context: Context) -> NSViewType {
+        NSViewType(frame: .zero)
+    }
+
+    func updateNSView(_ nsView: NSViewType, context: Context) {
+        nsView.onWindow {
             $object.ref(
                 sequence(first: $0, next: { $0.superview })
                     .first(where: { $0 is Object }) as? Object
             )
         }
     }
-
-    func updateNSView(_ uiView: NSViewType, context: Context) {}
 }
 
 extension OutletView {
-    class View: NSView {
-        let windowHandler: (NSView) -> Void
+    class NSViewType: NSView {
+        var windowHandler: ((NSView) -> Void)?
 
-        init(_ windowHandler: @escaping (NSView) -> Void) {
-            self.windowHandler = windowHandler
-            super.init(frame: .zero)
-        }
+        func onWindow(_ handler: @escaping (NSView) -> Void) {
+            if self.window != nil {
+                handler(self)
+                return
+            }
 
-        required init?(coder: NSCoder) {
-            fatalError("init(coder:) has not been implemented")
-        }
-
-        override init(frame: CGRect) {
-            fatalError("init(frame:) has not been implemented")
+            windowHandler = handler
         }
 
         override func viewDidMoveToWindow() {
@@ -142,7 +140,7 @@ extension OutletView {
                 return
             }
 
-            windowHandler(self)
+            windowHandler?(self)
         }
     }
 }
