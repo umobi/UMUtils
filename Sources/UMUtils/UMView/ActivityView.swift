@@ -23,7 +23,7 @@
 import UIKit
 import UICreator
 
-public struct UMActivity: UICView {
+public final class UMActivity: UICView {
     @Value private var timer: Timer? = nil
 
     @Relay private var isAnimating: Bool
@@ -85,7 +85,7 @@ public struct UMActivity: UICView {
     }
 
     public var body: ViewCreator {
-        UICCenter {
+        UICCenter { [unowned self] in
             UICRounder(radius: 7.5) {
                 UICZStack {
                     UICBlur(self.$blurEffect)

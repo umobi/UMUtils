@@ -23,8 +23,7 @@
 import UICreator
 import UIKit
 
-@frozen
-public struct UMAlert: UICView {
+final public class UMAlert: UICView {
     private let titles: [UICAnyView]
     private let subtitles: [UICAnyView]
     private let descriptions: [UICAnyView]
@@ -45,7 +44,7 @@ public struct UMAlert: UICView {
     }
 
     public var body: ViewCreator {
-        UICZStack {
+        UICZStack { [unowned self] in
             UICSpacer()
                 .backgroundColor(.black)
                 .alpha(0.35)
