@@ -23,7 +23,7 @@
 import Foundation
 
 @frozen
-public struct APIObject<Object: Decodable>: APIRawObject {
+public struct APIObject<Object>: APIRawObject where Object: Decodable {
     public let data: Object
 
     @inlinable

@@ -98,7 +98,7 @@ public extension Page {
 }
 
 public extension Page {
-    var refreshObservable: AnyPublisher<MetaPage, Never> {
+    var refreshPublisher: AnyPublisher<MetaPage, Never> {
         self.needsToLoadNextPage
             .flatMap { [weak page] _ -> AnyPublisher<MetaPage, Never> in
                 guard

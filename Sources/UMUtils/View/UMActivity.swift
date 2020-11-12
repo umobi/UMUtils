@@ -37,7 +37,7 @@ public struct UMActivity<Content>: View where Content: View {
 
     #if os(iOS) || os(tvOS)
     @Binding private var style: UIActivityIndicatorView.Style
-    @Binding private var color: Color
+    @Binding private var color: UIColor
     @Binding private var blurStyle: UIBlurEffect.Style
     #else
     @Binding private var style: NSControl.ControlSize
@@ -55,7 +55,7 @@ public struct UMActivity<Content>: View where Content: View {
     public init(
         _ blurStyle: Binding<UIBlurEffect.Style>,
         style: Binding<UIActivityIndicatorView.Style> = .constant(.medium),
-        color: Binding<Color>,
+        color: Binding<UIColor>,
         size: Size = .medium,
         mode: Mode = .forever,
         isAnimating: Binding<Bool>,
@@ -148,7 +148,7 @@ extension UMActivity where Content == Never {
     public init(
         _ blurStyle: Binding<UIBlurEffect.Style>,
         style: Binding<UIActivityIndicatorView.Style> = .constant(.medium),
-        color: Binding<Color>,
+        color: Binding<UIColor>,
         size: Size = .medium,
         mode: Mode = .forever,
         isAnimating: Binding<Bool>) {
@@ -220,7 +220,7 @@ public extension View {
     func activityIndicator<Content>(
         _ blurStyle: Binding<UIBlurEffect.Style>,
         style: Binding<UIActivityIndicatorView.Style> = .constant(.medium),
-        color: Binding<Color>,
+        color: Binding<UIColor>,
         size: UMActivity<Content>.Size = .medium,
         mode: UMActivity<Content>.Mode = .forever,
         isAnimating: Binding<Bool>,
@@ -246,7 +246,7 @@ public extension View {
     func activityIndicator(
         _ blurStyle: Binding<UIBlurEffect.Style>,
         style: Binding<UIActivityIndicatorView.Style> = .constant(.medium),
-        color: Binding<Color>,
+        color: Binding<UIColor>,
         size: UMActivity<Never>.Size = .medium,
         mode: UMActivity<Never>.Mode = .forever,
         isAnimating: Binding<Bool>

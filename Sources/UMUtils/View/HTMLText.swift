@@ -30,7 +30,7 @@ public struct HTMLText: UIViewRepresentable {
 
     private let htmlString: String
 
-    init(htmlString: String,
+    public init(htmlString: String,
          fontFamily: String = "-apple-system",
          fontSize: CGFloat = UIFont.systemFontSize) {
 

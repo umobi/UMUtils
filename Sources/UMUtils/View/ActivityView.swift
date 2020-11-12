@@ -27,14 +27,14 @@ import UIKit
 
 public struct ActivityView: UIViewRepresentable {
     @Binding var style: UIActivityIndicatorView.Style
-    @Binding var color: Color
+    @Binding var color: UIColor
 
-    public init(_ style: Binding<UIActivityIndicatorView.Style>,_ color: Binding<Color>) {
+    public init(_ style: Binding<UIActivityIndicatorView.Style>,_ color: Binding<UIColor>) {
         self._style = style
         self._color = color
     }
 
-    public init(_ style: UIActivityIndicatorView.Style, _ color: Color) {
+    public init(_ style: UIActivityIndicatorView.Style, _ color: UIColor) {
         self._style = .constant(style)
         self._color = .constant(color)
     }
@@ -45,11 +45,7 @@ public struct ActivityView: UIViewRepresentable {
 
     public func updateUIView(_ uiView: View, context: Context) {
         uiView.style = style
-        if #available(iOS 14, tvOS 14, *) {
-            uiView.color = .init(color)
-        } else {
-            uiView.color = .init(cgColor: color.cgColor!)
-        }
+        uiView.color = color
     }
 }
 
