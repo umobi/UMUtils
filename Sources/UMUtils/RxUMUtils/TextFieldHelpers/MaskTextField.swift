@@ -22,27 +22,59 @@
 
 import Foundation
 import SwiftUI
+import Combine
 
 @propertyWrapper @frozen
 public struct MaskedText: DynamicProperty {
-    @Mutable var string: String
+    @Mutable private var relay: Relay
     private let mask: MaskType
 
-    public init(wrappedValue value: String,_ mask: MaskType) {
+    public init(wrappedValue value: String?, _ mask: MaskType) {
         self.mask = mask
-        self._string = .init(wrappedValue: value)
+        _relay = .init(wrappedValue: value.map { .string($0) } ?? .nil)
     }
 
-    public var wrappedValue: String {
-        get { self.string }
+    @inline(__always)
+    public init(_ mask: MaskType) {
+        self.init(wrappedValue: nil, mask)
+    }
+
+    public var wrappedValue: String? {
+        get {
+            switch relay {
+            case .nil:
+                return nil
+            case .string(let string):
+                return string
+            }
+        }
         nonmutating
-        set { self.string = newValue.mask(self.mask) }
+        set {
+            if let string = newValue?.mask(mask) {
+                relay = .string(string)
+            } else {
+                relay = .nil
+            }
+        }
     }
 
-    public var projectedValue: Binding<String> {
-        .init(
-            get: { wrappedValue },
-            set: { wrappedValue = $0 }
-        )
+    public var projectedValue: AnyPublisher<String?, Never> {
+        _relay.publisher
+            .map {
+                switch $0 {
+                case .nil:
+                    return nil
+                case .string(let string):
+                    return string
+                }
+            }
+            .eraseToAnyPublisher()
+    }
+}
+
+private extension MaskedText {
+    enum Relay {
+        case `nil`
+        case string(String)
     }
 }

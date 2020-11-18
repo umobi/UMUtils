@@ -40,7 +40,7 @@ public struct BooleanIndicator: Publisher, DynamicProperty {
     public init() {}
 
     public func receive<S>(subscriber: S) where S : Subscriber, Self.Failure == S.Failure, Self.Output == S.Input {
-        subscriber.receive(subscription: Subscription(subscriber, self._subject.publisher))
+        subscriber.receive(subscription: Subscription(subscriber, self._subject.publisher.eraseToAnyPublisher()))
     }
 
     public var wrappedValue: Bool {

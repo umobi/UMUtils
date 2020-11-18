@@ -38,13 +38,13 @@ public struct Mutable<Value>: DynamicProperty {
     @ObservedObject private var _box: Box
 
     public init(wrappedValue: Value) {
-        self._box = .init(value: wrappedValue)
+        _box = .init(value: wrappedValue)
     }
 
     public var wrappedValue: Value {
-        get { self._box.value }
+        get { _box.value }
         nonmutating
-        set { self._box.value = newValue}
+        set { _box.value = newValue}
     }
 
     public var projectedValue: Binding<Value> {
@@ -54,8 +54,7 @@ public struct Mutable<Value>: DynamicProperty {
         )
     }
 
-    public var publisher: AnyPublisher<Value, Never> {
-        self._box.$value
-            .eraseToAnyPublisher()
+    public var publisher: Published<Value>.Publisher {
+        _box.$value
     }
 }
