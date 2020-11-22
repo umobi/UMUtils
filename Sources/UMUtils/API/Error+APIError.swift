@@ -39,6 +39,13 @@ public extension Error {
     }
 }
 
+public extension Swift.Error {
+    @inline(__always) @inlinable
+    var isSessionExpired: Bool {
+        (self as? RequestError)?.statusCode == 401
+    }
+}
+
 public protocol APIErrorDelegate {
     func didReviceError(_ error: Swift.Error)
 }
