@@ -20,85 +20,65 @@
 // THE SOFTWARE.
 //
 
-import Foundation
 import Network
 import Combine
+import SwiftUI
 
-@frozen
-public struct Networking {
-    private let box: Box
+@frozen @propertyWrapper
+public struct Networking: DynamicProperty {
+    @ObservedObject private var service: Service
 
-    public var isConnected: Publishers.HandleEvents<Published<Bool>.Publisher> {
-        self.box.startMonitoring()
-
-        return self.box.$isConnected.handleEvents(receiveCompletion: { _ in
-            self.box.stopMonitoring()
-        }, receiveCancel: {
-            self.box.stopMonitoring()
-        })
+    public init() {
+        service = .shared
     }
 
-    private init() {
-        self.box = .init()
+    public init(monitor: NWPathMonitor, queue: DispatchQueue) {
+        service = .init(
+            monitor: monitor,
+            queue: queue
+        )
     }
 
-    private init(observeInterfaceType: NWInterface.InterfaceType) {
-        self.box = .init(observeInterfaceType: observeInterfaceType)
+    public var wrappedValue: Bool {
+        service.isConnected
+    }
+
+    public var projectedValue: Published<Bool>.Publisher {
+        service.$isConnected
     }
 }
 
-extension Networking {
-    @usableFromInline
-    class Box {
+private extension Networking {
+    class Service: ObservableObject {
+        static let shared = Service()
+
         @Published var isConnected: Bool = false
 
-        let monitor: NWPathMonitor
-
-        var isMonitoring: Bool = false
-        var listenerCount: Int = 0
+        private let monitor: NWPathMonitor
+        private let queue: DispatchQueue
 
         init() {
-            self.monitor = .init()
+            monitor = .init()
+            queue = .init(label: "com.umobi.networking")
+            load()
         }
 
-        init(observeInterfaceType: NWInterface.InterfaceType) {
-            self.monitor = .init(requiredInterfaceType: observeInterfaceType)
+        init(monitor: NWPathMonitor, queue: DispatchQueue) {
+            self.monitor = monitor
+            self.queue = queue
+            load()
         }
 
-        func startMonitoring(in queue: DispatchQueue? = nil) {
-            self.listenerCount += 1
-
-            guard !self.isMonitoring else {
-                return
+        private func load() {
+            monitor.pathUpdateHandler = { [weak self] in
+                self?.isConnected = $0.status == .satisfied
             }
 
-            self.isMonitoring = true
-            self.monitor.pathUpdateHandler = { [weak self] in
-                self?.pathChanged($0)
-            }
-
-            self.monitor.start(queue: queue ?? .init(label: "com.umobi.networking"))
-        }
-
-        func stopMonitoring() {
-            self.listenerCount = positiveOrZero(self.listenerCount - 1)
-
-            if self.listenerCount == 0 {
-                self.monitor.cancel()
-                self.isMonitoring = false
-            }
-        }
-
-        func pathChanged(_ path: NWPath) {
-            self.isConnected = path.status == .satisfied
+            monitor.start(queue: queue)
         }
 
         deinit {
-            self.monitor.cancel()
+            monitor.cancel()
         }
     }
-}
-
-public extension Networking {
-    static let shared: Networking = .init()
 }

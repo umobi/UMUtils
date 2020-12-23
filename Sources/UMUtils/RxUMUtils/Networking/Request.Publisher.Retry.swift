@@ -32,7 +32,7 @@ private extension Publisher where Output: APIResultWrapper, Failure == Never {
                     .eraseToAnyPublisher()
             }
 
-            return Networking.shared.isConnected
+            return Networking().projectedValue
                 .filter { $0 }
                 .single()
                 .flatMap { _ in self.rawRetryOnConnect }
@@ -49,7 +49,7 @@ private extension Publisher where Output: APIResultWrapper, Failure == Never {
                     .eraseToAnyPublisher()
             }
 
-            return Networking.shared.isConnected
+            return Networking().projectedValue
                 .filter { $0 }
                 .single()
                 .flatMap { _ in self.singleRetryOnConnect(onError: onError) }
